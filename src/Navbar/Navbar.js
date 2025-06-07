@@ -1,24 +1,24 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // ✅ Importar
 import { User, Phone, Menu, X } from 'lucide-react';
-import './Navbar.css'; // Importar los estilos
+import './Navbar.css';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate(); // ✅ Hook de navegación
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
   const handleNavigation = (path) => {
-    // Simula navegación - reemplaza con tu lógica de enrutamiento
-    console.log(`Navegando a: ${path}`);
+    navigate(path); // ✅ Redirecciona usando React Router
     setIsMenuOpen(false);
   };
 
   return (
     <nav className="custom-navbar">
       <div className="navbar-container">
-        {/* Logo/Brand - Izquierda */}
         <div className="navbar-brand-container">
           <button 
             onClick={() => handleNavigation('/')}
@@ -28,7 +28,6 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* Desktop Menu - Derecha */}
         <div className="desktop-menu">
           <button
             onClick={() => handleNavigation('/contacto')}
@@ -46,7 +45,6 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* Mobile menu button */}
         <div className="mobile-menu-btn-container">
           <button
             onClick={toggleMenu}
@@ -57,7 +55,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile menu */}
       <div className={`mobile-menu ${isMenuOpen ? 'mobile-menu-open' : ''}`}>
         <div className="mobile-menu-content">
           <button

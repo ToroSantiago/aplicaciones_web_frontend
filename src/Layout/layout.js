@@ -4,7 +4,6 @@ import Navbar from '../Navbar/Navbar';
 import Body from '../Body/Body';
 import AuthForm from '../AuthForms/authForms';
 import RegisterForm from '../RegisterForm/registerForm';
-import Carousel from '../Carousel/carousel';
 
 const Layout = () => {
   const location = useLocation();
