@@ -1,0 +1,238 @@
+/* Navbar.css - Estilos para Essenza Royale */
+
+/* Navbar principal */
+.custom-navbar {
+  background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid #374151;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Container principal */
+.navbar-container {
+  max-width: 1200px;
+  min-width: 300px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 4rem;
+}
+
+/* Brand/Logo */
+.navbar-brand-container {
+  flex-shrink: 0;
+  margin-right: auto;
+}
+
+.navbar-brand-btn {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  padding: 0;
+}
+
+.navbar-brand-btn:hover {
+  color: #9ca3af;
+}
+
+/* Desktop Menu */
+.desktop-menu {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-left: auto;
+}
+
+/* Botones de navegación */
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+
+.nav-btn-secondary {
+  color: #9ca3af;
+  background: transparent;
+}
+
+.nav-btn-secondary:hover {
+  background-color: #1f2937;
+  color: #ffffff;
+}
+
+.nav-btn-primary {
+  background-color: #374151;
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+}
+
+.nav-btn-primary:hover {
+  background-color: #4b5563;
+}
+
+/* Mobile menu button container */
+.mobile-menu-btn-container {
+  display: none;
+}
+
+.mobile-toggle-btn {
+  background-color: #1f2937;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  color: #9ca3af;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mobile-toggle-btn:hover {
+  background-color: #374151;
+  color: #ffffff;
+}
+
+/* Mobile menu */
+.mobile-menu {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+}
+
+.mobile-menu-open {
+  max-height: 12rem;
+  opacity: 1;
+}
+
+.mobile-menu-content {
+  padding: 0.5rem 1rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background-color: #1f2937;
+  margin: 0 1rem;
+  border-radius: 0 0 0.5rem 0.5rem;
+  border: 1px solid #374151;
+  border-top: none;
+}
+
+/* Botones del menú móvil */
+.mobile-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+}
+
+.mobile-nav-btn-secondary {
+  color: #9ca3af;
+  background: transparent;
+}
+
+.mobile-nav-btn-secondary:hover {
+  background-color: #374151;
+  color: #ffffff;
+}
+
+.mobile-nav-btn-primary {
+  background-color: #374151;
+  color: #ffffff;
+}
+
+.mobile-nav-btn-primary:hover {
+  background-color: #4b5563;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .desktop-menu {
+    display: none;
+  }
+
+  .mobile-menu-btn-container {
+    display: block;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-menu {
+    display: none !important;
+  }
+}
+
+/* Focus states para accesibilidad */
+.navbar-brand-btn:focus,
+.nav-btn:focus,
+.mobile-nav-btn:focus,
+.mobile-toggle-btn:focus {
+  outline: 2px solid #6b7280;
+  outline-offset: 2px;
+}
+
+/* Animaciones adicionales */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-menu-open .mobile-menu-content {
+  animation: slideDown 0.3s ease;
+}
+
+/* Asegurar que los estilos no sean sobrescritos */
+.custom-navbar * {
+  box-sizing: border-box;
+}
+
+/* Eliminar estilos por defecto de botones */
+.custom-navbar button {
+  font-family: inherit;
+  line-height: inherit;
+}
+
+.custom-navbar button:focus {
+  outline-offset: 2px;
+}
+
+/* Hover effects adicionales */
+.nav-btn svg,
+.mobile-nav-btn svg {
+  transition: transform 0.2s ease;
+}
+
+.nav-btn:hover svg,
+.mobile-nav-btn:hover svg {
+  transform: scale(1.1);
+}
