@@ -10,14 +10,17 @@ const Body = () => {
   const [error, setError] = useState(null)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
+  // Estados para el modal de detalles
+  const [selectedPerfume, setSelectedPerfume] = useState(null)
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
+  const [selectedVolume, setSelectedVolume] = useState("")
+
   // Estados para los filtros
   const [filters, setFilters] = useState({
     genero: "",
-    precioMin: "",
-    precioMax: "",
     volumen: "",
-    soloConStock: false,
     marca: "",
+    ordenPrecio: "", // Nuevo filtro para ordenar por precio
   })
 
   // Reemplaza esta URL con la URL de tu backend en Vercel
@@ -64,16 +67,6 @@ const Body = () => {
       filtered = filtered.filter((perfume) => perfume.genero === filters.genero)
     }
 
-    // Filtro por precio mínimo
-    if (filters.precioMin) {
-      filtered = filtered.filter((perfume) => perfume.precio >= Number.parseFloat(filters.precioMin))
-    }
-
-    // Filtro por precio máximo
-    if (filters.precioMax) {
-      filtered = filtered.filter((perfume) => perfume.precio <= Number.parseFloat(filters.precioMax))
-    }
-
     // Filtro por volumen
     if (filters.volumen) {
       filtered = filtered.filter((perfume) => perfume.volumen === Number.parseInt(filters.volumen))
@@ -84,9 +77,11 @@ const Body = () => {
       filtered = filtered.filter((perfume) => perfume.marca.toLowerCase().includes(filters.marca.toLowerCase()))
     }
 
-    // Filtro solo con stock
-    if (filters.soloConStock) {
-      filtered = filtered.filter((perfume) => perfume.stock > 0)
+    // Ordenar por precio
+    if (filters.ordenPrecio === "menor") {
+      filtered.sort((a, b) => a.precio - b.precio)
+    } else if (filters.ordenPrecio === "mayor") {
+      filtered.sort((a, b) => b.precio - a.precio)
     }
 
     setFilteredPerfumes(filtered)
@@ -102,16 +97,27 @@ const Body = () => {
   const clearFilters = () => {
     setFilters({
       genero: "",
-      precioMin: "",
-      precioMax: "",
       volumen: "",
-      soloConStock: false,
       marca: "",
+      ordenPrecio: "",
     })
   }
 
   const toggleFilterModal = () => {
     setIsFilterOpen(!isFilterOpen)
+  }
+
+  // Funciones para el modal de detalles
+  const openDetailModal = (perfume) => {
+    setSelectedPerfume(perfume)
+    setSelectedVolume(perfume.volumen.toString()) // Seleccionar el volumen por defecto
+    setIsDetailModalOpen(true)
+  }
+
+  const closeDetailModal = () => {
+    setIsDetailModalOpen(false)
+    setSelectedPerfume(null)
+    setSelectedVolume("")
   }
 
   // Obtener valores únicos para los filtros
@@ -123,6 +129,41 @@ const Body = () => {
   const getUniqueBrands = () => {
     const brands = [...new Set(perfumes.map((p) => p.marca))]
     return brands.sort()
+  }
+
+  const getGenderLabel = (genero) => {
+    switch (genero) {
+      case "M":
+        return "Masculino"
+      case "F":
+        return "Femenino"
+      case "U":
+        return "Unisex"
+      default:
+        return genero
+    }
+  }
+
+  // Simular diferentes tamaños para el perfume seleccionado
+  const getPerfumeVariants = (perfume) => {
+    if (!perfume) return []
+
+    // Simular variantes basadas en el perfume actual
+    const basePrice = perfume.precio
+    const baseStock = perfume.stock
+
+    return [
+      { volumen: 30, precio: Math.round(basePrice * 0.6), stock: Math.max(0, baseStock - 2) },
+      { volumen: 50, precio: Math.round(basePrice * 0.8), stock: Math.max(0, baseStock - 1) },
+      { volumen: 75, precio: basePrice, stock: baseStock },
+      { volumen: 100, precio: Math.round(basePrice * 1.3), stock: Math.max(0, baseStock + 2) },
+    ]
+  }
+
+  const getSelectedVariant = () => {
+    if (!selectedPerfume || !selectedVolume) return null
+    const variants = getPerfumeVariants(selectedPerfume)
+    return variants.find((v) => v.volumen.toString() === selectedVolume)
   }
 
   // Componente de filtros reutilizable
@@ -175,41 +216,16 @@ const Body = () => {
       </div>
 
       <div className="luxury-filter-group">
-        <label className="luxury-form-label">Precio Mín.</label>
-        <input
-          type="number"
+        <label className="luxury-form-label">Ordenar por precio</label>
+        <select
           className="luxury-form-control"
-          placeholder="Precio mínimo"
-          value={filters.precioMin}
-          onChange={(e) => handleFilterChange("precioMin", e.target.value)}
-        />
-      </div>
-
-      <div className="luxury-filter-group">
-        <label className="luxury-form-label">Precio Máx.</label>
-        <input
-          type="number"
-          className="luxury-form-control"
-          placeholder="Precio máximo"
-          value={filters.precioMax}
-          onChange={(e) => handleFilterChange("precioMax", e.target.value)}
-        />
-      </div>
-
-      <div className="luxury-filter-group">
-        <label className="luxury-form-label">Disponibilidad</label>
-        <div
-          className="luxury-checkbox-group"
-          onClick={() => handleFilterChange("soloConStock", !filters.soloConStock)}
+          value={filters.ordenPrecio}
+          onChange={(e) => handleFilterChange("ordenPrecio", e.target.value)}
         >
-          <input
-            className="luxury-checkbox"
-            type="checkbox"
-            checked={filters.soloConStock}
-            onChange={(e) => handleFilterChange("soloConStock", e.target.checked)}
-          />
-          <label className="luxury-checkbox-label">Solo con stock</label>
-        </div>
+          <option value="">Sin ordenar</option>
+          <option value="menor">Menor a mayor precio</option>
+          <option value="mayor">Mayor a menor precio</option>
+        </select>
       </div>
 
       <div className="luxury-filter-actions">
@@ -265,9 +281,7 @@ const Body = () => {
             <button className="luxury-filter-toggle-btn" onClick={toggleFilterModal}>
               <span className="filter-icon">⚙️</span>
               Filtros
-              <span className="filter-count">
-                {Object.values(filters).filter((value) => value !== "" && value !== false).length}
-              </span>
+              <span className="filter-count">{Object.values(filters).filter((value) => value !== "").length}</span>
             </button>
           </div>
 
@@ -287,51 +301,35 @@ const Body = () => {
                   <div key={perfume.id} className="col-xl-4 col-lg-6 col-md-6 col-mobile-6">
                     <div
                       className="luxury-product-card luxury-product-clickable"
-                      onClick={() => {
-                        // Aquí irá la lógica del modal en el futuro
-                        console.log("Clicked perfume:", perfume.id)
-                      }}
+                      onClick={() => openDetailModal(perfume)}
                     >
                       <img
                         src={perfume.imagen_url || "https://via.placeholder.com/400x280/1a1a1a/ffffff?text=Sin+Imagen"}
                         className="luxury-product-image"
                         alt={perfume.nombre}
                       />
-                      <div className="luxury-product-body">
-                        <div className="luxury-product-header">
-                          <h5 className="luxury-product-title">{perfume.nombre}</h5>
-                          <h6 className="luxury-product-brand">{perfume.marca}</h6>
+                      <div className="luxury-product-body" style={{ textAlign: "center" }}>
+                        <div className="luxury-product-header" style={{ border: "none" }}>
+                          <h5 className="luxury-product-title" style={{ textAlign: "center" }}>
+                            {perfume.nombre}
+                          </h5>
+                          <h6 className="luxury-product-brand" style={{ textAlign: "center" }}>
+                            {perfume.marca}
+                          </h6>
                         </div>
 
-                        <p className="luxury-product-description">{perfume.descripcion}</p>
+                        <p className="luxury-product-description" style={{ textAlign: "center" }}>
+                          {perfume.descripcion}
+                        </p>
 
-                        <div className="luxury-product-details">
-                          <div className="luxury-product-price">${perfume.precio.toLocaleString("es-AR")}</div>
+                        <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+                          <span className="luxury-product-value">
+                            {perfume.genero === "M" ? "Masculino" : perfume.genero === "F" ? "Femenino" : "Unisex"}
+                          </span>
+                        </div>
 
-                          <div className="luxury-product-specs">
-                            <div className="luxury-spec-item">
-                              <span className="luxury-product-label">Volumen</span>
-                              <span className="luxury-product-value">{perfume.volumen}ml</span>
-                            </div>
-
-                            <div className="luxury-spec-item">
-                              <span className="luxury-product-label">Género</span>
-                              <span className="luxury-product-value">
-                                {perfume.genero === "M" ? "Masculino" : perfume.genero === "F" ? "Femenino" : "Unisex"}
-                              </span>
-                            </div>
-                          </div>
-
-                          <div
-                            className={`luxury-stock-info ${
-                              perfume.stock > 0 ? "luxury-stock-available" : "luxury-stock-unavailable"
-                            }`}
-                          >
-                            <span className="luxury-product-label">Disponibilidad</span>
-                            <div className="luxury-product-value">
-                              {perfume.stock > 0 ? `${perfume.stock} unidades` : "Sin stock"}
-                            </div>
-                          </div>
+                        <div className="luxury-product-price" style={{ marginTop: "auto" }}>
+                          ${perfume.precio.toLocaleString("es-AR")}
                         </div>
                       </div>
                     </div>
@@ -355,6 +353,69 @@ const Body = () => {
             </div>
             <div className="luxury-filter-modal-content">
               <FilterContent />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de detalles del perfume */}
+      {isDetailModalOpen && selectedPerfume && (
+        <div className="luxury-detail-modal-overlay" onClick={closeDetailModal}>
+          <div className="luxury-detail-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="luxury-detail-modal-header">
+              <h3 className="luxury-detail-modal-title">Detalles del Perfume - {selectedPerfume.nombre} de {selectedPerfume.marca} </h3>
+              <button className="luxury-detail-modal-close" onClick={closeDetailModal}>
+                ✕
+              </button>
+            </div>
+            <div className="luxury-detail-modal-content">
+              <div className="luxury-detail-modal-image">
+                <img
+                  src={
+                    selectedPerfume.imagen_url || "https://via.placeholder.com/400x400/1a1a1a/ffffff?text=Sin+Imagen"
+                  }
+                  alt={selectedPerfume.nombre}
+                  className="luxury-detail-image"
+                />
+              </div>
+              <div className="luxury-detail-modal-info">
+                <div className="luxury-detail-volume-section">
+                  <label className="luxury-detail-label">🧴 Seleccionar Tamaño</label>
+                  <select
+                    className="luxury-detail-volume-select"
+                    value={selectedVolume}
+                    onChange={(e) => setSelectedVolume(e.target.value)}
+                  >
+                    {getPerfumeVariants(selectedPerfume).map((variant) => (
+                      <option key={variant.volumen} value={variant.volumen}>
+                        {variant.volumen}ml - ${variant.precio.toLocaleString("es-AR")}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {getSelectedVariant() && (
+                  <div className="luxury-detail-selected-info">
+                    <div className="luxury-detail-price">${getSelectedVariant().precio.toLocaleString("es-AR")}</div>
+
+                    <div
+                      className={`luxury-detail-stock ${getSelectedVariant().stock > 0 ? "luxury-detail-stock-available" : "luxury-detail-stock-unavailable"}`}
+                    >
+                      <span className="luxury-detail-label">📦 Disponibilidad</span>
+                      <span className="luxury-detail-value">
+                        {getSelectedVariant().stock > 0 ? `${getSelectedVariant().stock} unidades` : "Sin stock"}
+                      </span>
+                    </div>
+
+                    <button
+                      className={`luxury-detail-add-button ${getSelectedVariant().stock === 0 ? "luxury-detail-add-button-disabled" : ""}`}
+                      disabled={getSelectedVariant().stock === 0}
+                    >
+                      {getSelectedVariant().stock === 0 ? "Sin Stock" : "Agregar al Carrito"}
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

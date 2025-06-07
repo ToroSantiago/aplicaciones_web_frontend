@@ -351,15 +351,6 @@
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.luxury-product-clickable {
-  cursor: pointer;
-  user-select: none;
-}
-
-.luxury-product-clickable:hover {
-  transform: translateY(-12px);
-}
-
 .luxury-product-card::before {
   content: "";
   position: absolute;
@@ -368,12 +359,6 @@
   right: 0;
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-}
-
-.luxury-product-card:hover {
-  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.6), 0 4px 16px rgba(255, 255, 255, 0.08) inset;
-  transform: translateY(-8px);
-  border-color: #444;
 }
 
 .luxury-product-image {
@@ -775,5 +760,358 @@ html {
 
   .row.g-3.g-md-4 {
     margin: 0 -0.25rem;
+  }
+}
+
+/* Estilos para el modal de detalles del perfume */
+.luxury-product-clickable {
+  cursor: pointer;
+}
+
+.luxury-detail-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.luxury-detail-modal {
+  background: linear-gradient(180deg, #1e1e1e 0%, #1a1a1a 50%, #161616 100%);
+  border-radius: 20px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideInScale 0.3s ease-out;
+  border: 1px solid #333;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+.luxury-detail-modal-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #2a2a2a 0%, #252525 50%, #1f1f1f 100%);
+  border-radius: 20px 20px 0 0;
+}
+
+.luxury-detail-modal-title {
+  color: #b8860b;
+  font-size: 1.4rem;
+  font-weight: 500;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.luxury-detail-modal-title::before {
+  content: "🔍";
+  font-size: 1.2rem;
+}
+
+.luxury-detail-modal-close {
+  background: none;
+  border: 2px solid #b8860b;
+  color: #b8860b;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.luxury-detail-modal-close:hover {
+  background: #b8860b;
+  color: #1a1a1a;
+  transform: rotate(90deg);
+}
+
+.luxury-detail-modal-content {
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.luxury-detail-modal-image {
+  text-align: center;
+}
+
+.luxury-detail-image {
+  width: 100%;
+  max-width: 350px;
+  height: auto;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.luxury-detail-modal-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.luxury-detail-title {
+  color: #ffffff;
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 0;
+  text-align: center;
+}
+
+.luxury-detail-brand {
+  color: #b8860b;
+  font-size: 1.3rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+  text-align: center;
+}
+
+.luxury-detail-specs {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.luxury-detail-spec-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.luxury-detail-label {
+  color: #b8860b;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.luxury-detail-value {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.luxury-detail-volume-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.luxury-detail-volume-select {
+  background: linear-gradient(145deg, #2a2a2a 0%, #252525 100%);
+  border: 1px solid #444;
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 1rem;
+  padding: 1rem 1.2rem;
+  transition: all 0.3s ease;
+  width: 100%;
+  cursor: pointer;
+}
+
+.luxury-detail-volume-select:focus {
+  border-color: #b8860b;
+  box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.2);
+  outline: none;
+}
+
+.luxury-detail-volume-select option {
+  background-color: #2a2a2a;
+  color: #ffffff;
+  padding: 0.5rem;
+}
+
+.luxury-detail-selected-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(184, 134, 11, 0.1), rgba(184, 134, 11, 0.05));
+  border-radius: 15px;
+  border: 1px solid rgba(184, 134, 11, 0.2);
+}
+
+.luxury-detail-price {
+  color: #ffffff;
+  font-size: 2.2rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.luxury-detail-stock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.luxury-detail-stock-available {
+  background: rgba(74, 222, 128, 0.1);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.luxury-detail-stock-available .luxury-detail-value {
+  color: #4ade80;
+}
+
+.luxury-detail-stock-unavailable {
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+.luxury-detail-stock-unavailable .luxury-detail-value {
+  color: #f87171;
+}
+
+.luxury-detail-add-button {
+  background: linear-gradient(135deg, #b8860b, #d4af37);
+  border: none;
+  border-radius: 12px;
+  color: #1a1a1a;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 1.2rem 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(184, 134, 11, 0.3);
+}
+
+.luxury-detail-add-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(184, 134, 11, 0.4);
+}
+
+.luxury-detail-add-button-disabled {
+  background: linear-gradient(135deg, #666, #555) !important;
+  color: #999 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+}
+
+.luxury-detail-add-button-disabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Animaciones para el modal de detalles */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Responsive para el modal de detalles */
+@media (max-width: 768px) {
+  .luxury-detail-modal {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .luxury-detail-modal-content {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+
+  .luxury-detail-title {
+    font-size: 1.5rem;
+  }
+
+  .luxury-detail-brand {
+    font-size: 1.1rem;
+  }
+
+  .luxury-detail-price {
+    font-size: 1.8rem;
+  }
+
+  .luxury-detail-add-button {
+    font-size: 1rem;
+    padding: 1rem 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .luxury-detail-modal {
+    width: 98%;
+    margin: 1rem;
+  }
+
+  .luxury-detail-modal-content {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .luxury-detail-modal-header {
+    padding: 1rem;
+  }
+
+  .luxury-detail-title {
+    font-size: 1.3rem;
+  }
+
+  .luxury-detail-brand {
+    font-size: 1rem;
+  }
+
+  .luxury-detail-price {
+    font-size: 1.5rem;
+    padding: 0.8rem;
+  }
+
+  .luxury-detail-specs {
+    padding: 1rem;
+  }
+
+  .luxury-detail-selected-info {
+    padding: 1rem;
   }
 }
