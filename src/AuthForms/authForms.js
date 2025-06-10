@@ -36,7 +36,7 @@ const LoginForm = () => {
         <div className="auth-content">
           <form className="auth-form" onSubmit={handleSubmit}>
             <div className="form-group">
-              <label className="form-label" htmlFor="email">Usuario o Email</label>
+              <label className="form-label" htmlFor="email">Email</label>
               <input 
                 type="email" 
                 id="email" 

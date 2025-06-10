@@ -4,6 +4,7 @@ import Navbar from '../Navbar/Navbar';
 import Body from '../Body/Body';
 import AuthForm from '../AuthForms/authForms';
 import RegisterForm from '../RegisterForm/registerForm';
+import Footer from '../Footer/Footer';
 
 const Layout = () => {
   const location = useLocation();
@@ -23,10 +24,13 @@ const Layout = () => {
   };
 
   return (
-    <>
+    <div className="d-flex flex-column min-vh-100"> {/* Asegura que el contenedor tenga altura suficiente */}
       <Navbar />
-      {renderContent()}
-    </>
+      <div className="flex-grow-1"> {/* Este div hace que el contenido ocupe el espacio disponible */}
+        {renderContent()}
+      </div>
+      <Footer />
+    </div>
   );
 };
 

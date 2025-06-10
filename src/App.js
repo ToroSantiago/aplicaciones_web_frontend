@@ -9,9 +9,7 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/*" element={<Layout />} />
-        <Route path="/footer" element={<Footer />} />
       </Routes>
-      <Footer />
     </BrowserRouter>
   );
 };

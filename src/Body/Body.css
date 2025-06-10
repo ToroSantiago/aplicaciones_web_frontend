@@ -4,12 +4,15 @@
   background-color: #0a0a0a;
   min-height: 100vh;
   color: #ffffff;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Layout principal */
 .luxury-layout {
   display: flex;
-  min-height: 100vh;
+  flex: 1;
+  position: relative;
 }
 
 /* Sidebar de filtros para desktop */
@@ -19,8 +22,8 @@
   border-right: 1px solid #333;
   position: fixed;
   left: 0;
-  top: 0;
-  height: 100vh;
+  top: 60px; /* Altura del navbar */
+  height: calc(100vh - 60px); /* Altura total menos el navbar */
   overflow-y: auto;
   z-index: 100;
   box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
@@ -61,6 +64,7 @@
   flex: 1;
   margin-left: 320px;
   padding: 2rem;
+  min-height: auto; /* Cambiado para no forzar altura mínima */
 }
 
 /* Botón de filtros para móvil */
@@ -339,7 +343,7 @@
   font-size: 1rem;
 }
 
-/* Estilos de las tarjetas de productos */
+/* Estilos de las tarjetas de productos - MEJORADOS */
 .luxury-product-card {
   background: linear-gradient(145deg, #1a1a1a 0%, #151515 100%);
   border: 1px solid #333;
@@ -349,6 +353,8 @@
   overflow: hidden;
   position: relative;
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: flex;
+  flex-direction: column;
 }
 
 .luxury-product-card::before {
@@ -361,32 +367,41 @@
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
 }
 
-.luxury-product-image {
-  border-radius: 20px 20px 0 0;
-  height: 160px;
-  object-fit: cover;
-  transition: all 0.4s ease;
+/* Contenedor de imagen mejorado para imágenes cuadradas */
+.luxury-product-image-container {
   width: 100%;
+  height: 250px;
+  overflow: hidden;
+  border-radius: 20px 20px 0 0;
   position: relative;
+  background: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.luxury-product-image::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 40px;
-  background: linear-gradient(transparent, rgba(26, 26, 26, 0.8));
-  pointer-events: none;
+.luxury-product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  transition: all 0.4s ease;
+  border-radius: 20px 20px 0 0;
+  padding: 10px;
+  background: linear-gradient(135deg, #f8f8f8 0%, #ffffff 100%);
+}
+
+.luxury-product-card:hover .luxury-product-image {
+  transform: scale(1.05);
 }
 
 .luxury-product-body {
   display: flex;
   flex-direction: column;
-  height: calc(100% - 160px);
+  flex: 1;
   padding: 1rem;
   position: relative;
+  text-align: center;
 }
 
 .luxury-product-header {
@@ -406,6 +421,7 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  text-align: center;
 }
 
 .luxury-product-brand {
@@ -415,6 +431,7 @@
   letter-spacing: 0.5px;
   text-transform: uppercase;
   margin: 0;
+  text-align: center;
 }
 
 .luxury-product-description {
@@ -427,10 +444,25 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   flex-grow: 1;
+  text-align: center;
 }
 
-.luxury-product-details {
-  margin-top: auto;
+/* Género del perfume - CENTRADO EN MÓVIL */
+.luxury-product-gender {
+  text-align: center;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background: rgba(184, 134, 11, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(184, 134, 11, 0.2);
+}
+
+.luxury-product-value {
+  color: #b8860b;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .luxury-product-price {
@@ -438,7 +470,7 @@
   font-size: 1.3rem;
   font-weight: 600;
   letter-spacing: 0.3px;
-  margin-bottom: 1rem;
+  margin-top: auto;
   text-align: center;
   padding: 0.6rem;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
@@ -468,13 +500,6 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 0.3rem;
-  display: block;
-}
-
-.luxury-product-value {
-  color: #ffffff;
-  font-size: 0.9rem;
-  font-weight: 500;
   display: block;
 }
 
@@ -603,7 +628,7 @@ html {
   scrollbar-color: #b8860b #1a1a1a;
 }
 
-/* Responsive adjustments */
+/* Responsive adjustments - MEJORADOS */
 @media (max-width: 768px) {
   .luxury-sidebar {
     display: none;
@@ -618,16 +643,12 @@ html {
     display: block;
   }
 
+  .luxury-product-image-container {
+    height: 180px;
+  }
+
   .luxury-product-body {
     padding: 0.8rem;
-  }
-
-  .luxury-product-image {
-    height: 120px;
-  }
-
-  .luxury-product-body {
-    height: calc(100% - 120px);
   }
 
   .luxury-product-title {
@@ -645,40 +666,20 @@ html {
     margin-bottom: 0.8rem;
   }
 
-  .luxury-product-price {
-    font-size: 1.1rem;
-    padding: 0.5rem;
+  .luxury-product-gender {
     margin-bottom: 0.8rem;
-  }
-
-  .luxury-product-specs {
-    grid-template-columns: 1fr;
-    gap: 0.3rem;
-    padding: 0.5rem;
-    margin-bottom: 0.8rem;
-  }
-
-  .luxury-spec-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.1rem 0;
-  }
-
-  .luxury-product-label {
-    margin-bottom: 0;
-    text-align: left;
-    font-size: 0.7rem;
+    padding: 0.4rem;
+    text-align: center; /* Asegurar centrado en móvil */
   }
 
   .luxury-product-value {
-    text-align: right;
     font-size: 0.8rem;
+    text-align: center; /* Centrado explícito */
   }
 
-  .luxury-stock-info {
-    margin-bottom: 0.8rem;
-    padding: 0.4rem;
+  .luxury-product-price {
+    font-size: 1.1rem;
+    padding: 0.5rem;
   }
 
   .col-mobile-6 {
@@ -697,13 +698,17 @@ html {
     border-radius: 15px;
   }
 
-  .luxury-product-image {
-    height: 100px;
+  .luxury-product-image-container {
+    height: 160px;
     border-radius: 15px 15px 0 0;
   }
 
+  .luxury-product-image {
+    border-radius: 15px 15px 0 0;
+    padding: 8px;
+  }
+
   .luxury-product-body {
-    height: calc(100% - 100px);
     padding: 0.6rem;
   }
 
@@ -727,29 +732,20 @@ html {
     -webkit-line-clamp: 1;
   }
 
-  .luxury-product-price {
-    font-size: 1rem;
-    padding: 0.4rem;
+  .luxury-product-gender {
     margin-bottom: 0.6rem;
-  }
-
-  .luxury-product-specs {
-    padding: 0.4rem;
-    margin-bottom: 0.6rem;
-    gap: 0.2rem;
-  }
-
-  .luxury-product-label {
-    font-size: 0.65rem;
+    padding: 0.3rem;
+    text-align: center; /* Centrado en móvil pequeño */
   }
 
   .luxury-product-value {
     font-size: 0.75rem;
+    text-align: center; /* Centrado explícito */
   }
 
-  .luxury-stock-info {
-    margin-bottom: 0.6rem;
-    padding: 0.3rem;
+  .luxury-product-price {
+    font-size: 1rem;
+    padding: 0.4rem;
   }
 
   .col-mobile-6 {

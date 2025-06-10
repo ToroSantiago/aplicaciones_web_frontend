@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import "./Body.css" // Importar los estilos
+import "./Body.css"
 
 const Body = () => {
   const [perfumes, setPerfumes] = useState([])
@@ -20,7 +20,7 @@ const Body = () => {
     genero: "",
     volumen: "",
     marca: "",
-    ordenPrecio: "", // Nuevo filtro para ordenar por precio
+    ordenPrecio: "",
   })
 
   // Reemplaza esta URL con la URL de tu backend en Vercel
@@ -110,7 +110,7 @@ const Body = () => {
   // Funciones para el modal de detalles
   const openDetailModal = (perfume) => {
     setSelectedPerfume(perfume)
-    setSelectedVolume(perfume.volumen.toString()) // Seleccionar el volumen por defecto
+    setSelectedVolume(perfume.volumen.toString())
     setIsDetailModalOpen(true)
   }
 
@@ -148,7 +148,6 @@ const Body = () => {
   const getPerfumeVariants = (perfume) => {
     if (!perfume) return []
 
-    // Simular variantes basadas en el perfume actual
     const basePrice = perfume.precio
     const baseStock = perfume.stock
 
@@ -279,7 +278,7 @@ const Body = () => {
           {/* Botón de filtros para móvil */}
           <div className="luxury-mobile-filter-button">
             <button className="luxury-filter-toggle-btn" onClick={toggleFilterModal}>
-              <span className="filter-icon">⚙️</span>
+              <span className="filter-icon"></span>
               Filtros
               <span className="filter-count">{Object.values(filters).filter((value) => value !== "").length}</span>
             </button>
@@ -303,32 +302,34 @@ const Body = () => {
                       className="luxury-product-card luxury-product-clickable"
                       onClick={() => openDetailModal(perfume)}
                     >
-                      <img
-                        src={perfume.imagen_url || "https://via.placeholder.com/400x280/1a1a1a/ffffff?text=Sin+Imagen"}
-                        className="luxury-product-image"
-                        alt={perfume.nombre}
-                      />
-                      <div className="luxury-product-body" style={{ textAlign: "center" }}>
-                        <div className="luxury-product-header" style={{ border: "none" }}>
-                          <h5 className="luxury-product-title" style={{ textAlign: "center" }}>
+                      <div className="luxury-product-image-container">
+                        <img
+                          src={perfume.imagen_url || "https://via.placeholder.com/400x400/1a1a1a/ffffff?text=Sin+Imagen"}
+                          className="luxury-product-image"
+                          alt={perfume.nombre}
+                        />
+                      </div>
+                      <div className="luxury-product-body">
+                        <div className="luxury-product-header">
+                          <h5 className="luxury-product-title">
                             {perfume.nombre}
                           </h5>
-                          <h6 className="luxury-product-brand" style={{ textAlign: "center" }}>
+                          <h6 className="luxury-product-brand">
                             {perfume.marca}
                           </h6>
                         </div>
 
-                        <p className="luxury-product-description" style={{ textAlign: "center" }}>
+                        <p className="luxury-product-description">
                           {perfume.descripcion}
                         </p>
 
-                        <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+                        <div className="luxury-product-gender">
                           <span className="luxury-product-value">
-                            {perfume.genero === "M" ? "Masculino" : perfume.genero === "F" ? "Femenino" : "Unisex"}
+                            {getGenderLabel(perfume.genero)}
                           </span>
                         </div>
 
-                        <div className="luxury-product-price" style={{ marginTop: "auto" }}>
+                        <div className="luxury-product-price">
                           ${perfume.precio.toLocaleString("es-AR")}
                         </div>
                       </div>
@@ -363,7 +364,7 @@ const Body = () => {
         <div className="luxury-detail-modal-overlay" onClick={closeDetailModal}>
           <div className="luxury-detail-modal" onClick={(e) => e.stopPropagation()}>
             <div className="luxury-detail-modal-header">
-              <h3 className="luxury-detail-modal-title">Detalles del Perfume - {selectedPerfume.nombre} de {selectedPerfume.marca} </h3>
+              <h3 className="luxury-detail-modal-title">{selectedPerfume.nombre} de {selectedPerfume.marca}</h3>
               <button className="luxury-detail-modal-close" onClick={closeDetailModal}>
                 ✕
               </button>
