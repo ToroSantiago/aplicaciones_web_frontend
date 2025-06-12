@@ -2,11 +2,11 @@
 
 .luxury-body-container {
   background-color: #0a0a0a;
-  min-height: 100vh;
-  color: #ffffff;
+  flex: 1; /* Agregá esto */
   display: flex;
   flex-direction: column;
 }
+
 
 /* Layout principal */
 .luxury-layout {
@@ -20,7 +20,7 @@
   width: 320px;
   background: linear-gradient(180deg, #1e1e1e 0%, #1a1a1a 50%, #161616 100%);
   border-right: 1px solid #333;
-  position: fixed;
+  position: sticky;
   left: 0;
   top: 60px; /* Altura del navbar */
   height: calc(100vh - 60px); /* Altura total menos el navbar */
@@ -62,10 +62,9 @@
 /* Contenido principal */
 .luxury-main-content {
   flex: 1;
-  margin-left: 320px;
   padding: 2rem;
-  min-height: auto; /* Cambiado para no forzar altura mínima */
 }
+
 
 /* Botón de filtros para móvil */
 .luxury-mobile-filter-button {
