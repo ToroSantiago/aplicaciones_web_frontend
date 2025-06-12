@@ -40,21 +40,6 @@ const Footer = () => {
               Descubre la elegancia en cada fragancia. Ofrecemos las mejores marcas de perfumes de lujo con la atención
               personalizada que mereces.
             </p>
-            <div className="luxury-footer-social">
-              {socialLinks.map((social, index) => (
-                <a
-                  key={index}
-                  href={social.url}
-                  className="luxury-footer-social-link"
-                  title={social.name}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <span className="luxury-footer-social-icon">{social.icon}</span>
-                  <span className="luxury-footer-social-text">{social.name}</span>
-                </a>
-              ))}
-            </div>
           </div>
 
           {/* Información de contacto */}
@@ -66,26 +51,6 @@ const Footer = () => {
                 <div className="luxury-footer-contact-details">
                   <span className="luxury-footer-contact-label">Dirección</span>
                   <span className="luxury-footer-contact-value">{contactInfo.address}</span>
-                </div>
-              </div>
-
-              <div className="luxury-footer-contact-item">
-                <span className="luxury-footer-contact-icon">📞</span>
-                <div className="luxury-footer-contact-details">
-                  <span className="luxury-footer-contact-label">Teléfono</span>
-                  <a href={`tel:${contactInfo.phone}`} className="luxury-footer-contact-value luxury-footer-link">
-                    {contactInfo.phone}
-                  </a>
-                </div>
-              </div>
-
-              <div className="luxury-footer-contact-item">
-                <span className="luxury-footer-contact-icon">✉️</span>
-                <div className="luxury-footer-contact-details">
-                  <span className="luxury-footer-contact-label">Email</span>
-                  <a href={`mailto:${contactInfo.email}`} className="luxury-footer-contact-value luxury-footer-link">
-                    {contactInfo.email}
-                  </a>
                 </div>
               </div>
 
@@ -151,15 +116,6 @@ const Footer = () => {
                 ></iframe>
               )}
             </div>
-            <a
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(contactInfo.address)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="luxury-footer-map-link"
-            >
-              <span className="luxury-footer-map-link-icon">🧭</span>
-              Ver en Google Maps
-            </a>
           </div>
         </div>
 

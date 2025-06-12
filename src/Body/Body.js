@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import "./Body.css"
+import { addToCart } from "../Carrito/carrito"
 
 const Body = () => {
   const [perfumes, setPerfumes] = useState([])
@@ -304,34 +305,26 @@ const Body = () => {
                     >
                       <div className="luxury-product-image-container">
                         <img
-                          src={perfume.imagen_url || "https://via.placeholder.com/400x400/1a1a1a/ffffff?text=Sin+Imagen"}
+                          src={
+                            perfume.imagen_url || "https://via.placeholder.com/400x400/1a1a1a/ffffff?text=Sin+Imagen"
+                          }
                           className="luxury-product-image"
                           alt={perfume.nombre}
                         />
                       </div>
                       <div className="luxury-product-body">
                         <div className="luxury-product-header">
-                          <h5 className="luxury-product-title">
-                            {perfume.nombre}
-                          </h5>
-                          <h6 className="luxury-product-brand">
-                            {perfume.marca}
-                          </h6>
+                          <h5 className="luxury-product-title">{perfume.nombre}</h5>
+                          <h6 className="luxury-product-brand">{perfume.marca}</h6>
                         </div>
 
-                        <p className="luxury-product-description">
-                          {perfume.descripcion}
-                        </p>
+                        <p className="luxury-product-description">{perfume.descripcion}</p>
 
                         <div className="luxury-product-gender">
-                          <span className="luxury-product-value">
-                            {getGenderLabel(perfume.genero)}
-                          </span>
+                          <span className="luxury-product-value">{getGenderLabel(perfume.genero)}</span>
                         </div>
 
-                        <div className="luxury-product-price">
-                          ${perfume.precio.toLocaleString("es-AR")}
-                        </div>
+                        <div className="luxury-product-price">${perfume.precio.toLocaleString("es-AR")}</div>
                       </div>
                     </div>
                   </div>
@@ -364,7 +357,9 @@ const Body = () => {
         <div className="luxury-detail-modal-overlay" onClick={closeDetailModal}>
           <div className="luxury-detail-modal" onClick={(e) => e.stopPropagation()}>
             <div className="luxury-detail-modal-header">
-              <h3 className="luxury-detail-modal-title">{selectedPerfume.nombre} de {selectedPerfume.marca}</h3>
+              <h3 className="luxury-detail-modal-title">
+                {selectedPerfume.nombre} de {selectedPerfume.marca}
+              </h3>
               <button className="luxury-detail-modal-close" onClick={closeDetailModal}>
                 ✕
               </button>
@@ -411,6 +406,24 @@ const Body = () => {
                     <button
                       className={`luxury-detail-add-button ${getSelectedVariant().stock === 0 ? "luxury-detail-add-button-disabled" : ""}`}
                       disabled={getSelectedVariant().stock === 0}
+                      onClick={() => {
+                        if (getSelectedVariant().stock > 0) {
+                          // Crear un producto con el precio correcto según el volumen seleccionado
+                          const productToAdd = {
+                            ...selectedPerfume,
+                            precio: getSelectedVariant().precio, // Usar el precio de la variante seleccionada
+                          }
+
+                          // Agregar al carrito usando la función importada
+                          addToCart(productToAdd, 1, Number.parseInt(selectedVolume))
+
+                          // Mostrar mensaje de confirmación más detallado
+                          alert(`✅ ${selectedPerfume.nombre} (${selectedVolume}ml) agregado al carrito exitosamente`)
+
+                          // Cerrar el modal
+                          closeDetailModal()
+                        }
+                      }}
                     >
                       {getSelectedVariant().stock === 0 ? "Sin Stock" : "Agregar al Carrito"}
                     </button>

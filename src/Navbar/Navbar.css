@@ -22,10 +22,15 @@
   height: 4rem;
 }
 
-/* Brand/Logo */
 .navbar-brand-container {
-  flex-shrink: 0;
-  margin-right: auto;
+  flex: 1;
+}
+
+.desktop-menu {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
 }
 
 .navbar-brand-btn {
@@ -41,14 +46,6 @@
 
 .navbar-brand-btn:hover {
   color: #9ca3af;
-}
-
-/* Desktop Menu */
-.desktop-menu {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  margin-left: auto;
 }
 
 /* Botones de navegación */
@@ -236,3 +233,66 @@
 .mobile-nav-btn:hover svg {
   transform: scale(1.1);
 }
+
+/* Estilos adicionales para el carrito en el navbar */
+
+/* Estilos para el icono del carrito y contador */
+.cart-btn {
+  position: relative;
+}
+
+.cart-icon-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #b8860b;
+  color: #1a1a1a;
+  font-size: 0.7rem;
+  font-weight: bold;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+/* Ajustes específicos para desktop */
+@media (min-width: 769px) {
+  .desktop-menu .cart-btn .cart-count {
+    top: -6px;
+    right: -6px;
+  }
+}
+
+/* Ajustes específicos para móvil - contador en el menú hamburguesa */
+@media (max-width: 768px) {
+  .mobile-menu-content .cart-btn .cart-count {
+    top: -6px;
+    right: -6px;
+  }
+
+  /* Asegurar que el menú móvil tenga suficiente altura */
+  .mobile-menu-open {
+    max-height: 15rem; /* Aumentar altura para acomodar el carrito */
+  }
+}
+
+/* Estilo especial para el botón del carrito en móvil */
+@media (max-width: 768px) {
+  .mobile-nav-btn.cart-btn {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 0.5rem;
+    padding-bottom: 1rem;
+  }
+}
+
