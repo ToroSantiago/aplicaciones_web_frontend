@@ -68,9 +68,11 @@ const Body = () => {
       filtered = filtered.filter((perfume) => perfume.genero === filters.genero)
     }
 
-    // Filtro por volumen
+    // Filtro por volumen - ahora filtramos por variantes disponibles
     if (filters.volumen) {
-      filtered = filtered.filter((perfume) => perfume.volumen === Number.parseInt(filters.volumen))
+      filtered = filtered.filter((perfume) => 
+        perfume.variantes && perfume.variantes.some(v => v.volumen === Number.parseInt(filters.volumen))
+      )
     }
 
     // Filtro por marca
@@ -78,11 +80,11 @@ const Body = () => {
       filtered = filtered.filter((perfume) => perfume.marca.toLowerCase().includes(filters.marca.toLowerCase()))
     }
 
-    // Ordenar por precio
+    // Ordenar por precio (usando precio mínimo)
     if (filters.ordenPrecio === "menor") {
-      filtered.sort((a, b) => a.precio - b.precio)
+      filtered.sort((a, b) => (a.precio_minimo || 0) - (b.precio_minimo || 0))
     } else if (filters.ordenPrecio === "mayor") {
-      filtered.sort((a, b) => b.precio - a.precio)
+      filtered.sort((a, b) => (b.precio_maximo || 0) - (a.precio_maximo || 0))
     }
 
     setFilteredPerfumes(filtered)
@@ -111,7 +113,9 @@ const Body = () => {
   // Funciones para el modal de detalles
   const openDetailModal = (perfume) => {
     setSelectedPerfume(perfume)
-    setSelectedVolume(perfume.volumen.toString())
+    // Seleccionar el primer volumen disponible con stock
+    const primeraVarianteConStock = perfume.variantes?.find(v => v.stock > 0)
+    setSelectedVolume(primeraVarianteConStock ? primeraVarianteConStock.volumen.toString() : "")
     setIsDetailModalOpen(true)
   }
 
@@ -123,8 +127,13 @@ const Body = () => {
 
   // Obtener valores únicos para los filtros
   const getUniqueVolumes = () => {
-    const volumes = [...new Set(perfumes.map((p) => p.volumen))]
-    return volumes.sort((a, b) => a - b)
+    const volumes = new Set()
+    perfumes.forEach(perfume => {
+      if (perfume.variantes) {
+        perfume.variantes.forEach(v => volumes.add(v.volumen))
+      }
+    })
+    return Array.from(volumes).sort((a, b) => a - b)
   }
 
   const getUniqueBrands = () => {
@@ -145,25 +154,9 @@ const Body = () => {
     }
   }
 
-  // Simular diferentes tamaños para el perfume seleccionado
-  const getPerfumeVariants = (perfume) => {
-    if (!perfume) return []
-
-    const basePrice = perfume.precio
-    const baseStock = perfume.stock
-
-    return [
-      { volumen: 30, precio: Math.round(basePrice * 0.6), stock: Math.max(0, baseStock - 2) },
-      { volumen: 50, precio: Math.round(basePrice * 0.8), stock: Math.max(0, baseStock - 1) },
-      { volumen: 75, precio: basePrice, stock: baseStock },
-      { volumen: 100, precio: Math.round(basePrice * 1.3), stock: Math.max(0, baseStock + 2) },
-    ]
-  }
-
   const getSelectedVariant = () => {
-    if (!selectedPerfume || !selectedVolume) return null
-    const variants = getPerfumeVariants(selectedPerfume)
-    return variants.find((v) => v.volumen.toString() === selectedVolume)
+    if (!selectedPerfume || !selectedVolume || !selectedPerfume.variantes) return null
+    return selectedPerfume.variantes.find((v) => v.volumen.toString() === selectedVolume)
   }
 
   // Componente de filtros reutilizable
@@ -200,13 +193,13 @@ const Body = () => {
       </div>
 
       <div className="luxury-filter-group">
-        <label className="luxury-form-label">Volumen</label>
+        <label className="luxury-form-label">Tamaño</label>
         <select
           className="luxury-form-control"
           value={filters.volumen}
           onChange={(e) => handleFilterChange("volumen", e.target.value)}
         >
-          <option value="">Todos los volúmenes</option>
+          <option value="">Todos los tamaños</option>
           {getUniqueVolumes().map((volumen) => (
             <option key={volumen} value={volumen}>
               {volumen}ml
@@ -324,7 +317,19 @@ const Body = () => {
                           <span className="luxury-product-value">{getGenderLabel(perfume.genero)}</span>
                         </div>
 
-                        <div className="luxury-product-price">${perfume.precio.toLocaleString("es-AR")}</div>
+                        <div className="luxury-product-price">
+                          {perfume.precio_minimo === perfume.precio_maximo ? (
+                            `${parseFloat(perfume.precio_minimo).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                          ) : (
+                            `${parseFloat(perfume.precio_minimo).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} - ${parseFloat(perfume.precio_maximo).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                          )}
+                        </div>
+
+                        {perfume.hay_stock ? (
+                          <span className="luxury-product-stock luxury-product-stock-available">Disponible</span>
+                        ) : (
+                          <span className="luxury-product-stock luxury-product-stock-unavailable">Agotado</span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -382,9 +387,15 @@ const Body = () => {
                     value={selectedVolume}
                     onChange={(e) => setSelectedVolume(e.target.value)}
                   >
-                    {getPerfumeVariants(selectedPerfume).map((variant) => (
-                      <option key={variant.volumen} value={variant.volumen}>
-                        {variant.volumen}ml - ${variant.precio.toLocaleString("es-AR")}
+                    <option value="" disabled>Selecciona un tamaño</option>
+                    {selectedPerfume.variantes?.map((variant) => (
+                      <option 
+                        key={variant.volumen} 
+                        value={variant.volumen}
+                        disabled={variant.stock === 0}
+                      >
+                        {variant.volumen}ml - ${parseFloat(variant.precio).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} 
+                        {variant.stock === 0 ? " (Sin stock)" : ""}
                       </option>
                     ))}
                   </select>
@@ -392,7 +403,7 @@ const Body = () => {
 
                 {getSelectedVariant() && (
                   <div className="luxury-detail-selected-info">
-                    <div className="luxury-detail-price">${getSelectedVariant().precio.toLocaleString("es-AR")}</div>
+                    <div className="luxury-detail-price">${parseFloat(getSelectedVariant().precio).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
 
                     <div
                       className={`luxury-detail-stock ${getSelectedVariant().stock > 0 ? "luxury-detail-stock-available" : "luxury-detail-stock-unavailable"}`}
@@ -411,7 +422,9 @@ const Body = () => {
                           // Crear un producto con el precio correcto según el volumen seleccionado
                           const productToAdd = {
                             ...selectedPerfume,
-                            precio: getSelectedVariant().precio, // Usar el precio de la variante seleccionada
+                            precio: parseFloat(getSelectedVariant().precio), // Asegurar que sea número
+                            volumen: getSelectedVariant().volumen,
+                            stock: getSelectedVariant().stock
                           }
 
                           // Agregar al carrito usando la función importada
