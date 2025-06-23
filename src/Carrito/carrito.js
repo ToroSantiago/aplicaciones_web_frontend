@@ -8,7 +8,6 @@ const Carrito = ({ isOpen, onClose }) => {
   const [cartItems, setCartItems] = useState([])
   const [total, setTotal] = useState(0)
 
-  // Cargar items del carrito desde localStorage al iniciar
   useEffect(() => {
     const loadCartItems = () => {
       try {
@@ -35,7 +34,6 @@ const Carrito = ({ isOpen, onClose }) => {
 
     loadCartItems()
 
-    // Escuchar cambios en el localStorage
     const handleStorageChange = () => {
       loadCartItems()
     }
@@ -49,7 +47,6 @@ const Carrito = ({ isOpen, onClose }) => {
     }
   }, [])
 
-  // Función para actualizar localStorage y disparar eventos
   const updateCartAndNotify = (newCartItems) => {
     if (newCartItems.length > 0) {
       localStorage.setItem("carrito", JSON.stringify(newCartItems))
@@ -57,10 +54,8 @@ const Carrito = ({ isOpen, onClose }) => {
       localStorage.removeItem("carrito")
     }
 
-    // Disparar evento personalizado para notificar cambios
     window.dispatchEvent(new CustomEvent("cartUpdated"))
 
-    // También disparar evento de storage manualmente para asegurar sincronización
     window.dispatchEvent(
       new StorageEvent("storage", {
         key: "carrito",
@@ -70,13 +65,11 @@ const Carrito = ({ isOpen, onClose }) => {
     )
   }
 
-  // Calcular el total del carrito
   const calculateTotal = (items) => {
     const sum = items.reduce((acc, item) => acc + item.precio * item.cantidad, 0)
     setTotal(sum)
   }
 
-  // Incrementar cantidad de un producto
   const incrementQuantity = (id) => {
     const newCartItems = cartItems.map((item) => {
       if (item.id === id) {
@@ -88,13 +81,11 @@ const Carrito = ({ isOpen, onClose }) => {
       }
       return item
     })
-  
+
     setCartItems(newCartItems)
     updateCartAndNotify(newCartItems)
   }
-  
 
-  // Decrementar cantidad de un producto
   const decrementQuantity = (id) => {
     const newCartItems = cartItems.map((item) =>
       item.id === id && item.cantidad > 1 ? { ...item, cantidad: item.cantidad - 1 } : item,
@@ -103,23 +94,70 @@ const Carrito = ({ isOpen, onClose }) => {
     updateCartAndNotify(newCartItems)
   }
 
-  // Eliminar un producto del carrito
   const removeItem = (id) => {
     const newCartItems = cartItems.filter((item) => item.id !== id)
     setCartItems(newCartItems)
     updateCartAndNotify(newCartItems)
   }
 
-  // Vaciar todo el carrito
   const clearCart = () => {
     setCartItems([])
     localStorage.removeItem("carrito")
     updateCartAndNotify([])
   }
 
-  // Proceder al checkout
-  const handleCheckout = () => {
-    alert("¡Gracias por tu compra! Serás redirigido al proceso de pago.")
+  const handleCheckout = async () => {
+    console.log("DEBUG - cartItems:", cartItems)
+    if (cartItems.length === 0) return
+
+    const confirmCheckout = window.confirm("¿Deseás confirmar la compra?")
+    if (!confirmCheckout) return
+
+    try {
+      // Validar que todas las variantes tengan id válido
+      const itemsToBuy = cartItems.map((item) => {
+        const idReal = item.variante_id || item.id
+        if (!idReal) {
+          throw new Error(`El producto ${item.nombre} no tiene un ID válido para la compra.`)
+        }
+        return {
+          id: idReal,
+          cantidad: item.cantidad,
+        }
+      })
+
+      console.log("DEBUG - Enviando items: ", itemsToBuy)
+
+      const response = await fetch("http://127.0.0.1:8000/edp/compra", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ items: itemsToBuy }),
+      })
+
+      if (!response.ok) {
+        // Intentar leer el mensaje de error del backend
+        let errorData = {}
+        try {
+          errorData = await response.json()
+        } catch {
+          // No JSON, ignorar
+        }
+        alert("Error al comprar: " + (errorData.message || `HTTP ${response.status}`))
+        return
+      }
+
+      const data = await response.json()
+
+      alert("¡Compra realizada con éxito!")
+
+      clearCart()
+      onClose()
+    } catch (error) {
+      console.error("Error al procesar el checkout:", error)
+      alert("Ocurrió un error durante la compra: " + error.message)
+    }
   }
 
   if (!isOpen) return null
@@ -216,11 +254,13 @@ export const addToCart = (product, quantity = 1, selectedVolume) => {
       }
     }
 
+    // Usar variante_id si existe, sino product.id (para backend)
+    const varianteIdReal = product.variante_id || product.id
+
     const productId = `${product.id}-${selectedVolume}`
     const existingItemIndex = currentCart.findIndex((item) => item.id === productId)
     const existingItem = currentCart[existingItemIndex]
 
-    // Validar stock antes de agregar
     const stockDisponible = product.stock
 
     const cantidadActualEnCarrito = existingItem ? existingItem.cantidad : 0
@@ -232,7 +272,8 @@ export const addToCart = (product, quantity = 1, selectedVolume) => {
     }
 
     const productToAdd = {
-      id: productId,
+      id: productId, // clave única para el frontend
+      variante_id: varianteIdReal, // id real para backend
       nombre: product.nombre,
       marca: product.marca,
       precio: product.precio,
@@ -242,6 +283,8 @@ export const addToCart = (product, quantity = 1, selectedVolume) => {
       stock: stockDisponible,
     }
 
+    console.log("DEBUG - Agregando producto al carrito:", productToAdd)
+
     if (existingItemIndex >= 0) {
       currentCart[existingItemIndex].cantidad = nuevaCantidad
     } else {
@@ -250,7 +293,6 @@ export const addToCart = (product, quantity = 1, selectedVolume) => {
 
     localStorage.setItem("carrito", JSON.stringify(currentCart))
 
-    // Disparar múltiples eventos para asegurar sincronización
     window.dispatchEvent(new CustomEvent("cartUpdated"))
     window.dispatchEvent(
       new StorageEvent("storage", {
@@ -267,8 +309,6 @@ export const addToCart = (product, quantity = 1, selectedVolume) => {
   }
 }
 
-
-// Función para obtener el número de items en el carrito
 export const getCartItemCount = () => {
   try {
     const savedCart = localStorage.getItem("carrito")
