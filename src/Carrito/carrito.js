@@ -78,10 +78,21 @@ const Carrito = ({ isOpen, onClose }) => {
 
   // Incrementar cantidad de un producto
   const incrementQuantity = (id) => {
-    const newCartItems = cartItems.map((item) => (item.id === id ? { ...item, cantidad: item.cantidad + 1 } : item))
+    const newCartItems = cartItems.map((item) => {
+      if (item.id === id) {
+        if (item.cantidad < item.stock) {
+          return { ...item, cantidad: item.cantidad + 1 }
+        } else {
+          alert(`No hay stock disponible para ${item.nombre} de ${item.volumen}ml`)
+        }
+      }
+      return item
+    })
+  
     setCartItems(newCartItems)
     updateCartAndNotify(newCartItems)
   }
+  
 
   // Decrementar cantidad de un producto
   const decrementQuantity = (id) => {
@@ -205,20 +216,34 @@ export const addToCart = (product, quantity = 1, selectedVolume) => {
       }
     }
 
+    const productId = `${product.id}-${selectedVolume}`
+    const existingItemIndex = currentCart.findIndex((item) => item.id === productId)
+    const existingItem = currentCart[existingItemIndex]
+
+    // Validar stock antes de agregar
+    const stockDisponible = product.stock
+
+    const cantidadActualEnCarrito = existingItem ? existingItem.cantidad : 0
+    const nuevaCantidad = cantidadActualEnCarrito + quantity
+
+    if (nuevaCantidad > stockDisponible) {
+      alert(`¡Solo hay ${stockDisponible} unidades disponibles de ${product.nombre} ${selectedVolume}ml!`)
+      return currentCart
+    }
+
     const productToAdd = {
-      id: `${product.id}-${selectedVolume}`,
+      id: productId,
       nombre: product.nombre,
       marca: product.marca,
       precio: product.precio,
       imagen_url: product.imagen_url,
       volumen: selectedVolume,
       cantidad: quantity,
+      stock: stockDisponible,
     }
 
-    const existingItemIndex = currentCart.findIndex((item) => item.id === productToAdd.id)
-
     if (existingItemIndex >= 0) {
-      currentCart[existingItemIndex].cantidad += quantity
+      currentCart[existingItemIndex].cantidad = nuevaCantidad
     } else {
       currentCart.push(productToAdd)
     }
@@ -241,6 +266,7 @@ export const addToCart = (product, quantity = 1, selectedVolume) => {
     return []
   }
 }
+
 
 // Función para obtener el número de items en el carrito
 export const getCartItemCount = () => {
