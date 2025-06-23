@@ -324,12 +324,10 @@ const Body = () => {
                             `${parseFloat(perfume.precio_minimo).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} - ${parseFloat(perfume.precio_maximo).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                           )}
                         </div>
-
-                        {perfume.hay_stock ? (
-                          <span className="luxury-product-stock luxury-product-stock-available">Disponible</span>
-                        ) : (
-                          <span className="luxury-product-stock luxury-product-stock-unavailable">Agotado</span>
-                        )}
+                        <hr></hr>
+                        <span className={`luxury-stock-info ${perfume.hay_stock ? 'luxury-stock-available' : 'luxury-stock-unavailable'}`}>
+                          {perfume.hay_stock ? 'Disponible' : 'Agotado'}
+                        </span>
                       </div>
                     </div>
                   </div>

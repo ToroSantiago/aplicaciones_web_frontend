@@ -7,7 +7,6 @@
   flex-direction: column;
 }
 
-
 /* Layout principal */
 .luxury-layout {
   display: flex;
@@ -65,7 +64,6 @@
   padding: 2rem;
 }
 
-
 /* Botón de filtros para móvil */
 .luxury-mobile-filter-button {
   display: none;
@@ -85,7 +83,9 @@
   display: flex;
   align-items: center;
   gap: 0.8rem;
-  width: 100%;
+  width: auto;
+  max-width: 200px;
+  margin: 0 auto;
   justify-content: center;
   box-shadow: 0 4px 12px rgba(184, 134, 11, 0.3);
 }
@@ -643,7 +643,7 @@ html {
   }
 
   .luxury-product-image-container {
-    height: 180px;
+    height: 220px;
   }
 
   .luxury-product-body {
@@ -661,7 +661,7 @@ html {
 
   .luxury-product-description {
     font-size: 0.75rem;
-    -webkit-line-clamp: 1;
+    -webkit-line-clamp: 3;
     margin-bottom: 0.8rem;
   }
 
@@ -682,9 +682,9 @@ html {
   }
 
   .col-mobile-6 {
-    flex: 0 0 50%;
-    max-width: 50%;
-    padding: 0 0.3rem;
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding: 0 0.5rem;
   }
 }
 
@@ -698,7 +698,7 @@ html {
   }
 
   .luxury-product-image-container {
-    height: 160px;
+    height: 200px;
     border-radius: 15px 15px 0 0;
   }
 
@@ -728,7 +728,7 @@ html {
   .luxury-product-description {
     font-size: 0.7rem;
     margin-bottom: 0.6rem;
-    -webkit-line-clamp: 1;
+    -webkit-line-clamp: 3;
   }
 
   .luxury-product-gender {
@@ -748,9 +748,9 @@ html {
   }
 
   .col-mobile-6 {
-    flex: 0 0 50%;
-    max-width: 50%;
-    padding: 0 0.25rem;
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding: 0 0.5rem;
   }
 
   .row.g-3.g-md-4 {
