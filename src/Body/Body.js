@@ -293,9 +293,10 @@ const Body = () => {
                 filteredPerfumes.map((perfume) => (
                   <div key={perfume.id} className="col-xl-4 col-lg-6 col-md-6 col-mobile-6">
                     <div
-                      className="luxury-product-card luxury-product-clickable"
-                      onClick={() => openDetailModal(perfume)}
+                      className={`luxury-product-card ${perfume.hay_stock ? 'luxury-product-clickable' : 'luxury-product-disabled'}`}
+                      onClick={perfume.hay_stock ? () => openDetailModal(perfume) : undefined}
                     >
+
                       <div className="luxury-product-image-container">
                         <img
                           src={
