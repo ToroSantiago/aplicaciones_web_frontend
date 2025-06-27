@@ -55,7 +55,6 @@ const Carrito = ({ isOpen, onClose }) => {
     }
 
     window.dispatchEvent(new CustomEvent("cartUpdated"))
-
     window.dispatchEvent(
       new StorageEvent("storage", {
         key: "carrito",
@@ -70,9 +69,9 @@ const Carrito = ({ isOpen, onClose }) => {
     setTotal(sum)
   }
 
-  const incrementQuantity = (id) => {
+  const incrementQuantity = (varianteId) => {
     const newCartItems = cartItems.map((item) => {
-      if (item.id === id) {
+      if (item.variante_id === varianteId) {
         if (item.cantidad < item.stock) {
           return { ...item, cantidad: item.cantidad + 1 }
         } else {
@@ -86,16 +85,16 @@ const Carrito = ({ isOpen, onClose }) => {
     updateCartAndNotify(newCartItems)
   }
 
-  const decrementQuantity = (id) => {
+  const decrementQuantity = (varianteId) => {
     const newCartItems = cartItems.map((item) =>
-      item.id === id && item.cantidad > 1 ? { ...item, cantidad: item.cantidad - 1 } : item,
+      item.variante_id === varianteId && item.cantidad > 1 ? { ...item, cantidad: item.cantidad - 1 } : item,
     )
     setCartItems(newCartItems)
     updateCartAndNotify(newCartItems)
   }
 
-  const removeItem = (id) => {
-    const newCartItems = cartItems.filter((item) => item.id !== id)
+  const removeItem = (varianteId) => {
+    const newCartItems = cartItems.filter((item) => item.variante_id !== varianteId)
     setCartItems(newCartItems)
     updateCartAndNotify(newCartItems)
   }
@@ -114,17 +113,14 @@ const Carrito = ({ isOpen, onClose }) => {
     if (!confirmCheckout) return
 
     try {
-      // Validar que todas las variantes tengan id válido
       const itemsToBuy = cartItems.map((item) => {
-        const idReal = item.variante_id || item.id
-        if (!idReal) {
-          throw new Error(`El producto ${item.nombre} no tiene un ID válido para la compra.`)
-        }
         return {
-          id: idReal,
+          id: item.variante_id, // este es el perfume_id
+          volumen: item.volumen,
           cantidad: item.cantidad,
-        }
-      })
+        };
+      });
+      
 
       console.log("DEBUG - Enviando items: ", itemsToBuy)
 
@@ -137,21 +133,16 @@ const Carrito = ({ isOpen, onClose }) => {
       })
 
       if (!response.ok) {
-        // Intentar leer el mensaje de error del backend
         let errorData = {}
         try {
           errorData = await response.json()
-        } catch {
-          // No JSON, ignorar
-        }
+        } catch {}
         alert("Error al comprar: " + (errorData.message || `HTTP ${response.status}`))
         return
       }
 
       const data = await response.json()
-
       alert("¡Compra realizada con éxito!")
-
       clearCart()
       onClose()
     } catch (error) {
@@ -184,7 +175,7 @@ const Carrito = ({ isOpen, onClose }) => {
             <>
               <div className="carrito-items">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="carrito-item">
+                  <div key={item.variante_id} className="carrito-item">
                     <div className="carrito-item-image">
                       <img
                         src={item.imagen_url || "https://via.placeholder.com/100x100/1a1a1a/ffffff?text=Sin+Imagen"}
@@ -199,18 +190,21 @@ const Carrito = ({ isOpen, onClose }) => {
                     <div className="carrito-item-quantity">
                       <button
                         className="carrito-quantity-btn"
-                        onClick={() => decrementQuantity(item.id)}
+                        onClick={() => decrementQuantity(item.variante_id)}
                         disabled={item.cantidad <= 1}
                       >
                         <Minus size={16} />
                       </button>
                       <span className="carrito-quantity-value">{item.cantidad}</span>
-                      <button className="carrito-quantity-btn" onClick={() => incrementQuantity(item.id)}>
+                      <button
+                        className="carrito-quantity-btn"
+                        onClick={() => incrementQuantity(item.variante_id)}
+                      >
                         <Plus size={16} />
                       </button>
                     </div>
                     <div className="carrito-item-price">${(item.precio * item.cantidad).toLocaleString("es-AR")}</div>
-                    <button className="carrito-item-remove" onClick={() => removeItem(item.id)}>
+                    <button className="carrito-item-remove" onClick={() => removeItem(item.variante_id)}>
                       <Trash2 size={18} />
                     </button>
                   </div>
@@ -241,7 +235,6 @@ const Carrito = ({ isOpen, onClose }) => {
   )
 }
 
-// Función para agregar un producto al carrito
 export const addToCart = (product, quantity = 1, selectedVolume) => {
   try {
     const savedCart = localStorage.getItem("carrito")
@@ -254,15 +247,12 @@ export const addToCart = (product, quantity = 1, selectedVolume) => {
       }
     }
 
-    // Usar variante_id si existe, sino product.id (para backend)
     const varianteIdReal = product.variante_id || product.id
-
     const productId = `${product.id}-${selectedVolume}`
     const existingItemIndex = currentCart.findIndex((item) => item.id === productId)
     const existingItem = currentCart[existingItemIndex]
 
     const stockDisponible = product.stock
-
     const cantidadActualEnCarrito = existingItem ? existingItem.cantidad : 0
     const nuevaCantidad = cantidadActualEnCarrito + quantity
 
@@ -272,7 +262,7 @@ export const addToCart = (product, quantity = 1, selectedVolume) => {
     }
 
     const productToAdd = {
-      id: productId, // clave única para el frontend
+      id: productId, // solo para el frontend
       variante_id: varianteIdReal, // id real para backend
       nombre: product.nombre,
       marca: product.marca,
@@ -292,7 +282,6 @@ export const addToCart = (product, quantity = 1, selectedVolume) => {
     }
 
     localStorage.setItem("carrito", JSON.stringify(currentCart))
-
     window.dispatchEvent(new CustomEvent("cartUpdated"))
     window.dispatchEvent(
       new StorageEvent("storage", {
