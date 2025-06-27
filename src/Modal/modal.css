@@ -1,0 +1,208 @@
+/* CustomModal.css - Estilos para modales personalizados */
+
+.custom-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.custom-modal {
+  background: linear-gradient(180deg, #1e1e1e 0%, #1a1a1a 50%, #161616 100%);
+  border-radius: 20px;
+  width: 90%;
+  max-width: 450px;
+  border: 1px solid #333;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  animation: slideInScale 0.3s ease-out;
+  overflow: hidden;
+}
+
+.custom-modal-header {
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+  background: linear-gradient(135deg, #2a2a2a 0%, #252525 50%, #1f1f1f 100%);
+}
+
+.custom-modal-title {
+  color: #b8860b;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.confirm-modal .custom-modal-title::before {
+  content: "❓";
+  font-size: 1.2rem;
+}
+
+.alert-modal .custom-modal-title::before {
+  content: "🎉";
+  font-size: 1.2rem;
+}
+
+.custom-modal-content {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.custom-modal-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  animation: bounce 0.6s ease-in-out;
+}
+
+.custom-modal-message {
+  color: #ffffff;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  margin: 0;
+  text-align: center;
+}
+
+.custom-modal-actions {
+  padding: 1rem 1.5rem 1.5rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  background: linear-gradient(135deg, #2a2a2a 0%, #252525 50%, #1f1f1f 100%);
+}
+
+.custom-modal-btn {
+  padding: 0.8rem 2rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  min-width: 120px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.confirm-btn {
+  background: linear-gradient(135deg, #b8860b, #d4af37);
+  color: #1a1a1a;
+  box-shadow: 0 4px 15px rgba(184, 134, 11, 0.3);
+}
+
+.confirm-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(184, 134, 11, 0.4);
+}
+
+.cancel-btn {
+  background: transparent;
+  border: 2px solid #666;
+  color: #cccccc;
+}
+
+.cancel-btn:hover {
+  background: rgba(102, 102, 102, 0.1);
+  border-color: #888;
+  color: #ffffff;
+}
+
+/* Estilos específicos para modal de alerta */
+.alert-modal .custom-modal-actions {
+  justify-content: center;
+}
+
+.alert-modal .confirm-btn {
+  min-width: 150px;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .custom-modal {
+    width: 95%;
+    margin: 1rem;
+  }
+
+  .custom-modal-header {
+    padding: 1rem 1rem 0.8rem;
+  }
+
+  .custom-modal-title {
+    font-size: 1.1rem;
+  }
+
+  .custom-modal-content {
+    padding: 1.5rem 1rem;
+  }
+
+  .custom-modal-message {
+    font-size: 1rem;
+  }
+
+  .custom-modal-actions {
+    padding: 0.8rem 1rem 1rem;
+    flex-direction: column;
+  }
+
+  .custom-modal-btn {
+    padding: 0.7rem 1.5rem;
+    font-size: 0.9rem;
+    min-width: auto;
+    width: 100%;
+  }
+
+  .confirm-modal .custom-modal-actions {
+    flex-direction: row;
+  }
+}

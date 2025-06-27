@@ -55,18 +55,18 @@ const Footer = () => {
               </div>
 
               <div className="luxury-footer-contact-item">
-                <span className="luxury-footer-contact-icon">💬</span>
-                <div className="luxury-footer-contact-details">
-                  <span className="luxury-footer-contact-label">WhatsApp</span>
-                  <a
-                    href={`https://wa.me/${contactInfo.whatsapp.replace(/[^0-9]/g, "")}`}
-                    className="luxury-footer-contact-value luxury-footer-link"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {contactInfo.whatsapp}
-                  </a>
-                </div>
+                  <span className="luxury-footer-contact-icon">💬</span>
+                  <div className="luxury-footer-contact-details">
+                    <span className="luxury-footer-contact-label">WhatsApp</span>
+                    <a
+                      href={`https://wa.me/542804584782?text=${encodeURIComponent("Hola, quería consultar por un perfume.")}`}
+                      className="luxury-footer-contact-value luxury-footer-link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      2804 584782
+                    </a>
+                  </div>
               </div>
             </div>
           </div>
@@ -127,17 +127,6 @@ const Footer = () => {
           <div className="luxury-footer-bottom-content">
             <div className="luxury-footer-copyright">
               <span>© 2025 {contactInfo.name}. Todos los derechos reservados.</span>
-            </div>
-            <div className="luxury-footer-links">
-              <a href="#" className="luxury-footer-bottom-link">
-                Términos y Condiciones
-              </a>
-              <a href="#" className="luxury-footer-bottom-link">
-                Política de Privacidad
-              </a>
-              <a href="#" className="luxury-footer-bottom-link">
-                Cambios y Devoluciones
-              </a>
             </div>
           </div>
         </div>

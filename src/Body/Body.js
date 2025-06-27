@@ -272,7 +272,7 @@ const Body = () => {
           {/* Botón de filtros para móvil */}
           <div className="luxury-mobile-filter-button">
             <button className="luxury-filter-toggle-btn" onClick={toggleFilterModal}>
-              <span className="filter-icon"></span>
+              <span className="filter-icon">🔍</span>
               Filtros
               <span className="filter-count">{Object.values(filters).filter((value) => value !== "").length}</span>
             </button>
@@ -313,21 +313,26 @@ const Body = () => {
 
                         <p className="luxury-product-description">{perfume.descripcion}</p>
 
-                        <div className="luxury-product-gender">
-                          <span className="luxury-product-value">{getGenderLabel(perfume.genero)}</span>
-                        </div>
+                        <div className="luxury-product-badges">
+                          <div className="luxury-product-gender">
+                            <span className="luxury-product-value">{getGenderLabel(perfume.genero)}</span>
+                          </div>
 
-                        <div className="luxury-product-price">
-                          {perfume.precio_minimo === perfume.precio_maximo ? (
-                            `${parseFloat(perfume.precio_minimo).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                          ) : (
-                            `${parseFloat(perfume.precio_minimo).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} - ${parseFloat(perfume.precio_maximo).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                          )}
+                          <div className="luxury-product-price">
+                            <span className="luxury-price-value">
+                              {perfume.precio_minimo === perfume.precio_maximo ? (
+                                `$${parseFloat(perfume.precio_minimo).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                              ) : (
+                                `$${parseFloat(perfume.precio_minimo).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} - $${parseFloat(perfume.precio_maximo).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                              )}
+                            </span>
+                          </div>
+
+                          <div className={`luxury-stock-info ${perfume.hay_stock ? 'luxury-stock-available' : 'luxury-stock-unavailable'}`}>
+                            <span className="luxury-stock-icon">{perfume.hay_stock ? '✅' : '❌'}</span>
+                            <span className="luxury-stock-text">{perfume.hay_stock ? 'Disponible' : 'Agotado'}</span>
+                          </div>
                         </div>
-                        <hr></hr>
-                        <span className={`luxury-stock-info ${perfume.hay_stock ? 'luxury-stock-available' : 'luxury-stock-unavailable'}`}>
-                          {perfume.hay_stock ? 'Disponible' : 'Agotado'}
-                        </span>
                       </div>
                     </div>
                   </div>
