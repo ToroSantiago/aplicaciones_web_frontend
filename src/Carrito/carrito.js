@@ -124,7 +124,7 @@ const Carrito = ({ isOpen, onClose }) => {
 
       console.log("DEBUG - Enviando items: ", itemsToBuy)
 
-      const response = await fetch("https://essenzaroyalebackend.vercel.app:8000/edp/compra", {
+      const response = await fetch("http://aplicacioneswebbackend-git-dev-torosantiagos-projects.vercel.app/edp/compra", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
