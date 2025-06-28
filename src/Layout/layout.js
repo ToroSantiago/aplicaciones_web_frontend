@@ -4,6 +4,8 @@ import Navbar from '../Navbar/Navbar';
 import Body from '../Body/Body';
 import AuthForm from '../AuthForms/authForms';
 import RegisterForm from '../RegisterForm/registerForm';
+import Success from '../pages/Success'; // Agregar este import
+import Failed from '../pages/Failed';   // Agregar este import
 import Footer from '../Footer/Footer';
 
 const Layout = () => {
@@ -18,15 +20,19 @@ const Layout = () => {
         return <AuthForm />;
       case '/register':
         return <RegisterForm />;
+      case '/success':           // Agregar este caso
+        return <Success />;
+      case '/failed':            // Agregar este caso
+        return <Failed />;
       default:
         return <div className="container mt-5">Página no encontrada</div>;
     }
   };
 
   return (
-    <div className="d-flex flex-column min-vh-100"> {/* Asegura que el contenedor tenga altura suficiente */}
+    <div className="d-flex flex-column min-vh-100">
       <Navbar />
-      <div className="flex-grow-1"> {/* Este div hace que el contenido ocupe el espacio disponible */}
+      <div className="flex-grow-1">
         {renderContent()}
       </div>
       <Footer />
