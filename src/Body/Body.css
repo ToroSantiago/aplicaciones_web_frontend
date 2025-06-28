@@ -812,7 +812,7 @@ html {
   }
 }
 
-/* Estilos para el modal de detalles del perfume */
+/* Estilos para el modal de detalles del perfume - NUEVO LAYOUT */
 .luxury-product-clickable {
   cursor: pointer;
 }
@@ -836,7 +836,7 @@ html {
   background: linear-gradient(180deg, #1e1e1e 0%, #1a1a1a 50%, #161616 100%);
   border-radius: 20px;
   width: 90%;
-  max-width: 800px;
+  max-width: 900px;
   max-height: 90vh;
   overflow-y: auto;
   animation: slideInScale 0.3s ease-out;
@@ -893,62 +893,147 @@ html {
 
 .luxury-detail-modal-content {
   padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Imagen centrada arriba */
+.luxury-detail-modal-image-top {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.luxury-detail-image {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Contenido principal: descripción a la izquierda, opciones a la derecha */
+.luxury-detail-main-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
   align-items: start;
 }
 
-.luxury-detail-modal-image {
-  text-align: center;
-}
-
-.luxury-detail-image {
-  width: 100%;
-  max-width: 350px;
-  height: auto;
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-}
-
-.luxury-detail-modal-info {
+/* Sección de descripción (izquierda) */
+.luxury-detail-description-section {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
+.luxury-detail-product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+}
+
 .luxury-detail-title {
   color: #ffffff;
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 600;
   margin: 0;
-  text-align: center;
+  line-height: 1.3;
 }
 
 .luxury-detail-brand {
   color: #b8860b;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 0;
-  text-align: center;
 }
 
-.luxury-detail-specs {
+.luxury-detail-gender-badge {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.luxury-detail-gender {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, rgba(184, 134, 11, 0.15), rgba(184, 134, 11, 0.05));
+  border: 1px solid rgba(184, 134, 11, 0.3);
+  border-radius: 20px;
+  color: #b8860b;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.luxury-detail-description {
   display: flex;
   flex-direction: column;
   gap: 1rem;
   padding: 1.5rem;
   background: rgba(255, 255, 255, 0.02);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.luxury-detail-spec-item {
+.luxury-detail-description-title {
+  color: #b8860b;
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.luxury-detail-description-title::before {
+  content: "📝";
+  font-size: 1rem;
+}
+
+.luxury-detail-description-text {
+  color: #cccccc;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0;
+  text-align: justify;
+}
+
+/* Sección del carrito (derecha) */
+.luxury-detail-cart-section {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  height: fit-content;
+  position: sticky;
+  top: 1rem;
+}
+
+.luxury-detail-volume-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
 }
 
 .luxury-detail-label {
@@ -957,19 +1042,6 @@ html {
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-}
-
-.luxury-detail-value {
-  color: #ffffff;
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.5;
-}
-
-.luxury-detail-volume-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
 }
 
 .luxury-detail-volume-select {
@@ -1000,15 +1072,11 @@ html {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .luxury-detail-price {
   color: #ffffff;
-  font-size: 2.2rem;
+  font-size: 2rem;
   font-weight: 700;
   text-align: center;
   padding: 1rem;
@@ -1042,6 +1110,12 @@ html {
 
 .luxury-detail-stock-unavailable .luxury-detail-value {
   color: #f87171;
+}
+
+.luxury-detail-value {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 400;
 }
 
 .luxury-detail-add-button {
@@ -1105,9 +1179,17 @@ html {
   }
 
   .luxury-detail-modal-content {
+    padding: 1.5rem;
+    gap: 1.5rem;
+  }
+
+  .luxury-detail-main-content {
     grid-template-columns: 1fr;
     gap: 1.5rem;
-    padding: 1.5rem;
+  }
+
+  .luxury-detail-cart-section {
+    position: static;
   }
 
   .luxury-detail-title {
@@ -1125,6 +1207,10 @@ html {
   .luxury-detail-add-button {
     font-size: 1rem;
     padding: 1rem 1.5rem;
+  }
+
+  .luxury-detail-description-text {
+    font-size: 0.95rem;
   }
 }
 
@@ -1156,11 +1242,19 @@ html {
     padding: 0.8rem;
   }
 
-  .luxury-detail-specs {
+  .luxury-detail-product-info {
     padding: 1rem;
   }
 
-  .luxury-detail-selected-info {
+  .luxury-detail-description {
     padding: 1rem;
+  }
+
+  .luxury-detail-cart-section {
+    padding: 1rem;
+  }
+
+  .luxury-detail-description-text {
+    font-size: 0.9rem;
   }
 }

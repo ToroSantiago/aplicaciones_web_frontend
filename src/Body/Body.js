@@ -70,8 +70,8 @@ const Body = () => {
 
     // Filtro por volumen - ahora filtramos por variantes disponibles
     if (filters.volumen) {
-      filtered = filtered.filter((perfume) => 
-        perfume.variantes && perfume.variantes.some(v => v.volumen === Number.parseInt(filters.volumen))
+      filtered = filtered.filter(
+        (perfume) => perfume.variantes && perfume.variantes.some((v) => v.volumen === Number.parseInt(filters.volumen)),
       )
     }
 
@@ -114,7 +114,7 @@ const Body = () => {
   const openDetailModal = (perfume) => {
     setSelectedPerfume(perfume)
     // Seleccionar el primer volumen disponible con stock
-    const primeraVarianteConStock = perfume.variantes?.find(v => v.stock > 0)
+    const primeraVarianteConStock = perfume.variantes?.find((v) => v.stock > 0)
     setSelectedVolume(primeraVarianteConStock ? primeraVarianteConStock.volumen.toString() : "")
     setIsDetailModalOpen(true)
   }
@@ -128,9 +128,9 @@ const Body = () => {
   // Obtener valores únicos para los filtros
   const getUniqueVolumes = () => {
     const volumes = new Set()
-    perfumes.forEach(perfume => {
+    perfumes.forEach((perfume) => {
       if (perfume.variantes) {
-        perfume.variantes.forEach(v => volumes.add(v.volumen))
+        perfume.variantes.forEach((v) => volumes.add(v.volumen))
       }
     })
     return Array.from(volumes).sort((a, b) => a - b)
@@ -293,10 +293,9 @@ const Body = () => {
                 filteredPerfumes.map((perfume) => (
                   <div key={perfume.id} className="col-xl-4 col-lg-6 col-md-6 col-mobile-6">
                     <div
-                      className={`luxury-product-card ${perfume.hay_stock ? 'luxury-product-clickable' : 'luxury-product-disabled'}`}
+                      className={`luxury-product-card ${perfume.hay_stock ? "luxury-product-clickable" : "luxury-product-disabled"}`}
                       onClick={perfume.hay_stock ? () => openDetailModal(perfume) : undefined}
                     >
-
                       <div className="luxury-product-image-container">
                         <img
                           src={
@@ -321,17 +320,17 @@ const Body = () => {
 
                           <div className="luxury-product-price">
                             <span className="luxury-price-value">
-                              {perfume.precio_minimo === perfume.precio_maximo ? (
-                                `$${parseFloat(perfume.precio_minimo).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                              ) : (
-                                `$${parseFloat(perfume.precio_minimo).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                              )}
+                              {perfume.precio_minimo === perfume.precio_maximo
+                                ? `$${Number.parseFloat(perfume.precio_minimo).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                                : `$${Number.parseFloat(perfume.precio_minimo).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                             </span>
                           </div>
 
-                          <div className={`luxury-stock-info ${perfume.hay_stock ? 'luxury-stock-available' : 'luxury-stock-unavailable'}`}>
-                            <span className="luxury-stock-icon">{perfume.hay_stock ? '✅' : '❌'}</span>
-                            <span className="luxury-stock-text">{perfume.hay_stock ? 'Disponible' : 'Agotado'}</span>
+                          <div
+                            className={`luxury-stock-info ${perfume.hay_stock ? "luxury-stock-available" : "luxury-stock-unavailable"}`}
+                          >
+                            <span className="luxury-stock-icon">{perfume.hay_stock ? "✅" : "❌"}</span>
+                            <span className="luxury-stock-text">{perfume.hay_stock ? "Disponible" : "Agotado"}</span>
                           </div>
                         </div>
                       </div>
@@ -374,7 +373,8 @@ const Body = () => {
               </button>
             </div>
             <div className="luxury-detail-modal-content">
-              <div className="luxury-detail-modal-image">
+              {/* Imagen centrada arriba */}
+              <div className="luxury-detail-modal-image-top">
                 <img
                   src={
                     selectedPerfume.imagen_url || "https://via.placeholder.com/400x400/1a1a1a/ffffff?text=Sin+Imagen"
@@ -383,69 +383,100 @@ const Body = () => {
                   className="luxury-detail-image"
                 />
               </div>
-              <div className="luxury-detail-modal-info">
-                <div className="luxury-detail-volume-section">
-                  <label className="luxury-detail-label">🧴 Seleccionar Tamaño</label>
-                  <select
-                    className="luxury-detail-volume-select"
-                    value={selectedVolume}
-                    onChange={(e) => setSelectedVolume(e.target.value)}
-                  >
-                    <option value="" disabled>Selecciona un tamaño</option>
-                    {selectedPerfume.variantes?.map((variant) => (
-                      <option 
-                        key={variant.volumen} 
-                        value={variant.volumen}
-                        disabled={variant.stock === 0}
-                      >
-                        {variant.volumen}ml - ${parseFloat(variant.precio).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} 
-                        {variant.stock === 0 ? " (Sin stock)" : ""}
-                      </option>
-                    ))}
-                  </select>
+
+              {/* Contenido principal: descripción a la izquierda, opciones a la derecha */}
+              <div className="luxury-detail-main-content">
+                {/* Descripción a la izquierda */}
+                <div className="luxury-detail-description-section">
+                  <div className="luxury-detail-product-info">
+                    <h3 className="luxury-detail-title">{selectedPerfume.nombre}</h3>
+                    <h4 className="luxury-detail-brand">{selectedPerfume.marca}</h4>
+                    <div className="luxury-detail-gender-badge">
+                      <span className="luxury-detail-gender">{getGenderLabel(selectedPerfume.genero)}</span>
+                    </div>
+                  </div>
+
+                  <div className="luxury-detail-description">
+                    <h5 className="luxury-detail-description-title">Descripción</h5>
+                    <p className="luxury-detail-description-text">
+                      {selectedPerfume.descripcion || "Descripción no disponible para este perfume."}
+                    </p>
+                  </div>
                 </div>
 
-                {getSelectedVariant() && (
-                  <div className="luxury-detail-selected-info">
-                    <div className="luxury-detail-price">${parseFloat(getSelectedVariant().precio).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-
-                    <div
-                      className={`luxury-detail-stock ${getSelectedVariant().stock > 0 ? "luxury-detail-stock-available" : "luxury-detail-stock-unavailable"}`}
+                {/* Opciones del carrito a la derecha */}
+                <div className="luxury-detail-cart-section">
+                  <div className="luxury-detail-volume-section">
+                    <label className="luxury-detail-label">🧴 Seleccionar Tamaño</label>
+                    <select
+                      className="luxury-detail-volume-select"
+                      value={selectedVolume}
+                      onChange={(e) => setSelectedVolume(e.target.value)}
                     >
-                      <span className="luxury-detail-label">📦 Disponibilidad</span>
-                      <span className="luxury-detail-value">
-                        {getSelectedVariant().stock > 0 ? `${getSelectedVariant().stock} unidades` : "Sin stock"}
-                      </span>
-                    </div>
-
-                    <button
-                      className={`luxury-detail-add-button ${getSelectedVariant().stock === 0 ? "luxury-detail-add-button-disabled" : ""}`}
-                      disabled={getSelectedVariant().stock === 0}
-                      onClick={() => {
-                        if (getSelectedVariant().stock > 0) {
-                          // Crear un producto con el precio correcto según el volumen seleccionado
-                          const productToAdd = {
-                            ...selectedPerfume,
-                            precio: parseFloat(getSelectedVariant().precio), // Asegurar que sea número
-                            volumen: getSelectedVariant().volumen,
-                            stock: getSelectedVariant().stock
-                          }
-
-                          // Agregar al carrito usando la función importada
-                          addToCart(productToAdd, 1, Number.parseInt(selectedVolume))
-
-                          // Mostrar mensaje de confirmación más detallado
-                          alert(`✅ ${selectedPerfume.nombre} (${selectedVolume}ml) agregado al carrito exitosamente`)
-
-                          // Cerrar el modal
-                          closeDetailModal()
-                        }
-                      }}
-                    >
-                      {getSelectedVariant().stock === 0 ? "Sin Stock" : "Agregar al Carrito"}
-                    </button>
+                      <option value="" disabled>
+                        Selecciona un tamaño
+                      </option>
+                      {selectedPerfume.variantes?.map((variant) => (
+                        <option key={variant.volumen} value={variant.volumen} disabled={variant.stock === 0}>
+                          {variant.volumen}ml - $
+                          {Number.parseFloat(variant.precio).toLocaleString("es-AR", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                          {variant.stock === 0 ? " (Sin stock)" : ""}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                )}
+
+                  {getSelectedVariant() && (
+                    <div className="luxury-detail-selected-info">
+                      <div className="luxury-detail-price">
+                        $
+                        {Number.parseFloat(getSelectedVariant().precio).toLocaleString("es-AR", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </div>
+
+                      <div
+                        className={`luxury-detail-stock ${getSelectedVariant().stock > 0 ? "luxury-detail-stock-available" : "luxury-detail-stock-unavailable"}`}
+                      >
+                        <span className="luxury-detail-label">📦 Disponibilidad</span>
+                        <span className="luxury-detail-value">
+                          {getSelectedVariant().stock > 0 ? `${getSelectedVariant().stock} unidades` : "Sin stock"}
+                        </span>
+                      </div>
+
+                      <button
+                        className={`luxury-detail-add-button ${getSelectedVariant().stock === 0 ? "luxury-detail-add-button-disabled" : ""}`}
+                        disabled={getSelectedVariant().stock === 0}
+                        onClick={() => {
+                          if (getSelectedVariant().stock > 0) {
+                            // Crear un producto con el precio correcto según el volumen seleccionado
+                            const productToAdd = {
+                              ...selectedPerfume,
+                              precio: Number.parseFloat(getSelectedVariant().precio), // Asegurar que sea número
+                              volumen: getSelectedVariant().volumen,
+                              stock: getSelectedVariant().stock,
+                            }
+
+                            // Agregar al carrito usando la función importada
+                            addToCart(productToAdd, 1, Number.parseInt(selectedVolume))
+
+                            // Mostrar mensaje de confirmación más detallado
+                            alert(`✅ ${selectedPerfume.nombre} (${selectedVolume}ml) agregado al carrito exitosamente`)
+
+                            // Cerrar el modal
+                            closeDetailModal()
+                          }
+                        }}
+                      >
+                        {getSelectedVariant().stock === 0 ? "Sin Stock" : "Agregar al Carrito"}
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
