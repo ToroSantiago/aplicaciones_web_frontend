@@ -4,18 +4,54 @@ import './authForms.css';
 
 const LoginForm = () => {
   const navigate = useNavigate();
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  const API_URL = "https://aplicacioneswebbackend-git-dev-torosantiagos-projects.vercel.app/api";
 
   const togglePassword = () => setShowPassword(!showPassword);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login attempt:', { email, password });
-    alert('Formulario enviado! (Esta es solo una demostración)');
-    navigate('/home');
+    setError('');
+    setLoading(true);
+    
+    try {
+      const response = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Guardar el token y datos del usuario
+        localStorage.setItem('auth_token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.usuario));
+        
+        // Redirigir según el rol
+        if (data.usuario.rol === 'Administrador') {
+          // Redirigir al panel de administración de Laravel
+          window.location.href = 'https://aplicacioneswebbackend-git-dev-torosantiagos-projects.vercel.app/dashboard';
+        } else {
+          navigate('/home');
+        }
+      } else {
+        setError(data.error || 'Error al iniciar sesión');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setError('Error de conexión. Por favor intenta de nuevo.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -35,6 +71,12 @@ const LoginForm = () => {
         </div>
         <div className="auth-content">
           <form className="auth-form" onSubmit={handleSubmit}>
+            {error && (
+              <div className="error-alert">
+                {error}
+              </div>
+            )}
+            
             <div className="form-group">
               <label className="form-label" htmlFor="email">Email</label>
               <input 
@@ -45,8 +87,10 @@ const LoginForm = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                disabled={loading}
               />
             </div>
+            
             <div className="form-group">
               <label className="form-label" htmlFor="password">Contraseña</label>
               <div className="password-container">
@@ -58,27 +102,36 @@ const LoginForm = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  disabled={loading}
                 />
-                <button type="button" className="password-toggle" onClick={togglePassword}>
+                <button 
+                  type="button" 
+                  className="password-toggle" 
+                  onClick={togglePassword}
+                  disabled={loading}
+                >
                   <span>{showPassword ? '🙈' : '👁️'}</span>
                 </button>
               </div>
             </div>
-            <button type="submit" className="submit-btn">Iniciar Sesión</button>
+            
+            <button 
+              type="submit" 
+              className="submit-btn"
+              disabled={loading}
+            >
+              {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+            </button>
           </form>
-
-          <div className="divider">
-            <span className="divider-text">O continúa con</span>
-          </div>
-
-          <button type="button" className="google-btn" onClick={handleGoogleLogin}>
-            <span className="google-icon">✉️</span>
-            Iniciar sesión con Google
-          </button>
-
+                    
           <div className="auth-switch">
             ¿No tienes una cuenta?{' '}
-            <button type="button" className="link-btn" onClick={handleRegister}>
+            <button 
+              type="button" 
+              className="link-btn" 
+              onClick={handleRegister}
+              disabled={loading}
+            >
               Regístrate aquí
             </button>
           </div>
