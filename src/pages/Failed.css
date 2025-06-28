@@ -1,0 +1,188 @@
+.failed-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #0a0a0a 100%);
+  padding: 20px;
+}
+
+.failed-card {
+  background: linear-gradient(180deg, #1e1e1e 0%, #1a1a1a 50%, #161616 100%);
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 500px;
+  width: 100%;
+  border: 1px solid #333;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  text-align: center;
+  animation: slideUp 0.5s ease-out;
+  position: relative;
+  z-index: 1;
+}
+
+.failed-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  animation: shake 0.5s ease-out;
+}
+
+.failed-icon svg {
+  width: 100%;
+  height: 100%;
+  color: #ef4444;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+.failed-title {
+  font-size: 2rem;
+  color: #ef4444;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.failed-title::before {
+  content: "❌ ";
+  font-size: 1.8rem;
+}
+
+.failed-message {
+  color: #ffffff;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.failed-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Estilo específico para la información del error */
+.payment-details {
+  background: linear-gradient(135deg, #2a2a2a 0%, #252525 50%, #1f1f1f 100%);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 30px;
+  text-align: left;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.payment-details p {
+  margin: 8px 0;
+  color: #cccccc;
+}
+
+.payment-details strong {
+  color: #ef4444;
+  margin-right: 8px;
+}
+
+/* Botones con el mismo estilo que success pero adaptados */
+.failed-actions .btn-primary {
+  background: linear-gradient(135deg, #b8860b, #d4af37);
+  color: #1a1a1a;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(184, 134, 11, 0.3);
+}
+
+.failed-actions .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(184, 134, 11, 0.4);
+}
+
+.failed-actions .btn-secondary {
+  background: transparent;
+  color: #b8860b;
+  border: 2px solid #b8860b;
+  padding: 12px 30px;
+  border: 2px solid #666;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.failed-actions .btn-secondary:hover {
+  background: rgba(102, 102, 102, 0.1);
+  border-color: #888;
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .failed-card {
+    padding: 30px 20px;
+  }
+
+  .failed-title {
+    font-size: 1.5rem;
+  }
+
+  .failed-message {
+    font-size: 1rem;
+  }
+
+  .failed-actions {
+    flex-direction: column;
+  }
+
+  .failed-actions .btn-primary,
+  .failed-actions .btn-secondary {
+    width: 100%;
+  }
+}
+
+.failed-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 25% 35%, #ef4444 0%, transparent 2%),
+    radial-gradient(circle at 65% 75%, #dc2626 0%, transparent 2%),
+    radial-gradient(circle at 85% 15%, #ef4444 0%, transparent 1.5%),
+    radial-gradient(circle at 10% 85%, #b91c1c 0%, transparent 1.5%),
+    radial-gradient(circle at 45% 55%, #ef4444 0%, transparent 1%),
+    radial-gradient(circle at 70% 30%, #dc2626 0%, transparent 1%);
+  background-size: 300px 300px;
+  opacity: 0.3;
+  animation: floatError 25s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes floatError {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  25% {
+    transform: translateY(-20px) rotate(90deg) scale(1.1);
+  }
+  50% {
+    transform: translateY(20px) rotate(180deg) scale(0.9);
+  }
+  75% {
+    transform: translateY(-10px) rotate(270deg) scale(1.05);
+  }
+}
