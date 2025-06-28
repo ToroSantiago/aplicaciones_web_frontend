@@ -16,7 +16,7 @@ const RegisterForm = () => {
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   
   const navigate = useNavigate();
-  const API_URL = "https://aplicacioneswebbackend-git-dev-torosantiagos-projects.vercel.app/api";
+  const API_URL = "https://aplicacioneswebbackend-git-dev-torosantiagos-projects.vercel.app/edp";
 
   const handleChange = (e) => {
     setFormData({

@@ -10,7 +10,7 @@ const LoginForm = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
-  const API_URL = "https://aplicacioneswebbackend-git-dev-torosantiagos-projects.vercel.app/api";
+  const API_URL = "https://aplicacioneswebbackend-git-dev-torosantiagos-projects.vercel.app/edp";
 
   const togglePassword = () => setShowPassword(!showPassword);
 
