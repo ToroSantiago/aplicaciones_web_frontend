@@ -128,51 +128,48 @@ const Carrito = ({ isOpen, onClose }) => {
   }
 
   const handleCheckout = async () => {
-    console.log("DEBUG - cartItems:", cartItems)
     if (cartItems.length === 0) return
 
     const confirmed = await showConfirm("Confirmar Compra", "¿Estás seguro de que quieres proceder con la compra?")
-
     if (!confirmed) return
 
     try {
-      const itemsToBuy = cartItems.map((item) => {
-        return {
-          id: item.variante_id,
-          volumen: item.volumen,
-          cantidad: item.cantidad,
-        }
-      })
+      const mpItems = cartItems.map((item) => ({
+        id: item.variante_id,
+        title: `${item.nombre} - ${item.volumen}ml`,
+        quantity: item.cantidad,
+        unit_price: parseFloat(item.precio),
+      }))
 
-      console.log("DEBUG - Enviando items: ", itemsToBuy)
-
-      const response = await fetch(
-        "https://aplicacioneswebbackend-git-dev-torosantiagos-projects.vercel.app/edp/compra",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ items: itemsToBuy }),
-        },
-      )
-
-      if (!response.ok) {
-        let errorData = {}
-        try {
-          errorData = await response.json()
-        } catch {}
-        await showAlert("Error en la Compra", errorData.message || `Error HTTP ${response.status}`)
-        return
+      const payer = {
+        name: "Cliente",
+        surname: "Invitado",
+        email: "test_user_646915520@testuser.com",
       }
 
+      const response = await fetch("https://aplicacioneswebbackend-git-dev-torosantiagos-projects.vercel.app/edp/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ items: mpItems, payer }),
+      })
+
       const data = await response.json()
-      await showAlert("¡Compra Exitosa!", "Tu pedido ha sido procesado correctamente")
-      clearCart()
-      onClose()
+
+      if (!data.success) {
+        await showAlert("Error al generar el pago", data.error || "Error desconocido")
+        return
+      }
+      
+      console.log(data)
+      
+      // Redirigir al Checkout de Mercado Pago
+      window.location.href = data.init_point
+
     } catch (error) {
-      console.error("Error al procesar el checkout:", error)
-      await showAlert("Error", "Ocurrió un error durante la compra: " + error.message)
+      console.error("Error en checkout:", error)
+      await showAlert("Error", "Ocurrió un error al procesar el pago: " + error.message)
     }
   }
 
@@ -275,6 +272,10 @@ const Carrito = ({ isOpen, onClose }) => {
   )
 }
 
+export default Carrito
+
+// --- Funciones auxiliares exportadas para uso externo ---
+
 export const addToCart = async (product, quantity = 1, selectedVolume) => {
   try {
     const savedCart = localStorage.getItem("carrito")
@@ -342,8 +343,6 @@ export const addToCart = async (product, quantity = 1, selectedVolume) => {
       stock: stockDisponible,
     }
 
-    console.log("DEBUG - Agregando producto al carrito:", productToAdd)
-
     if (existingItemIndex >= 0) {
       currentCart[existingItemIndex].cantidad = nuevaCantidad
     } else {
@@ -390,5 +389,3 @@ export const getCartItemCount = () => {
     return 0
   }
 }
-
-export default Carrito

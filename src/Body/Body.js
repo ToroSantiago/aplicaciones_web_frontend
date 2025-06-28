@@ -324,7 +324,7 @@ const Body = () => {
                               {perfume.precio_minimo === perfume.precio_maximo ? (
                                 `$${parseFloat(perfume.precio_minimo).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                               ) : (
-                                `$${parseFloat(perfume.precio_minimo).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} - $${parseFloat(perfume.precio_maximo).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                                `$${parseFloat(perfume.precio_minimo).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                               )}
                             </span>
                           </div>
