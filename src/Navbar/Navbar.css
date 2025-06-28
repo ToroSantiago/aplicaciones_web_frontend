@@ -73,16 +73,6 @@
   color: #ffffff;
 }
 
-.nav-btn-primary {
-  background-color: #374151;
-  color: #ffffff;
-  padding: 0.5rem 1rem;
-}
-
-.nav-btn-primary:hover {
-  background-color: #4b5563;
-}
-
 /* Mobile menu button container */
 .mobile-menu-btn-container {
   display: none;
@@ -115,7 +105,7 @@
 }
 
 .mobile-menu-open {
-  max-height: 12rem;
+  max-height: 8rem;
   opacity: 1;
 }
 
@@ -155,15 +145,6 @@
 .mobile-nav-btn-secondary:hover {
   background-color: #374151;
   color: #ffffff;
-}
-
-.mobile-nav-btn-primary {
-  background-color: #374151;
-  color: #ffffff;
-}
-
-.mobile-nav-btn-primary:hover {
-  background-color: #4b5563;
 }
 
 /* Responsive Design */
@@ -234,8 +215,6 @@
   transform: scale(1.1);
 }
 
-/* Estilos adicionales para el carrito en el navbar */
-
 /* Estilos para el icono del carrito y contador */
 .cart-btn {
   position: relative;
@@ -281,18 +260,17 @@
     right: -6px;
   }
 
-  /* Asegurar que el menú móvil tenga suficiente altura */
+  /* Reducir altura del menú móvil ya que solo tiene el carrito */
   .mobile-menu-open {
-    max-height: 15rem; /* Aumentar altura para acomodar el carrito */
+    max-height: 8rem;
   }
 }
 
 /* Estilo especial para el botón del carrito en móvil */
 @media (max-width: 768px) {
   .mobile-nav-btn.cart-btn {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 0.5rem;
-    padding-bottom: 1rem;
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0.75rem;
   }
 }
-
