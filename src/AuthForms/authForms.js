@@ -123,7 +123,21 @@ const LoginForm = () => {
               {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
             </button>
           </form>
-                    
+          
+          <div className="divider">
+            <span className="divider-text">O continúa con</span>
+          </div>
+          
+          <button 
+            type="button" 
+            className="google-btn" 
+            onClick={handleGoogleLogin}
+            disabled={loading}
+          >
+            <span className="google-icon">✉️</span>
+            Iniciar sesión con Google
+          </button>
+          
           <div className="auth-switch">
             ¿No tienes una cuenta?{' '}
             <button 

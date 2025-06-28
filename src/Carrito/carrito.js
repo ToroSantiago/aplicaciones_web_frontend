@@ -127,6 +127,7 @@ const Carrito = ({ isOpen, onClose }) => {
     }
   }
 
+  // Función handleCheckout mejorada con debugging y manejo de errores
   const handleCheckout = async () => {
     if (cartItems.length === 0) return
 
@@ -147,29 +148,62 @@ const Carrito = ({ isOpen, onClose }) => {
         email: "test_user_646915520@testuser.com",
       }
 
+      const requestBody = { items: mpItems, payer }
+      
+      console.log("🚀 Enviando request:", JSON.stringify(requestBody, null, 2))
+
       const response = await fetch("https://aplicacioneswebbackend-git-dev-torosantiagos-projects.vercel.app/edp/checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json", // Importante: especificar que esperamos JSON
         },
-        body: JSON.stringify({ items: mpItems, payer }),
+        body: JSON.stringify(requestBody),
       })
 
+      console.log("📡 Response status:", response.status)
+      console.log("📡 Response headers:", [...response.headers.entries()])
+
+      // Verificar si la respuesta es JSON antes de parsear
+      const contentType = response.headers.get("content-type")
+      if (!contentType || !contentType.includes("application/json")) {
+        const textResponse = await response.text()
+        console.error("❌ Respuesta no es JSON:", textResponse)
+        await showAlert("Error del Servidor", `El servidor respondió con un error. Status: ${response.status}. Por favor, revisa la consola para más detalles.`)
+        return
+      }
+
       const data = await response.json()
+      console.log("📦 Response data:", data)
+
+      if (!response.ok) {
+        console.error("❌ Response not OK:", response.status, data)
+        await showAlert("Error al generar el pago", data.error || `Error del servidor (${response.status})`)
+        return
+      }
 
       if (!data.success) {
         await showAlert("Error al generar el pago", data.error || "Error desconocido")
         return
       }
       
-      console.log(data)
+      console.log("✅ Pago creado exitosamente:", data)
       
       // Redirigir al Checkout de Mercado Pago
-      window.location.href = data.init_point
+      if (data.init_point) {
+        window.location.href = data.init_point
+      } else {
+        await showAlert("Error", "No se recibió la URL de pago")
+      }
 
     } catch (error) {
-      console.error("Error en checkout:", error)
-      await showAlert("Error", "Ocurrió un error al procesar el pago: " + error.message)
+      console.error("💥 Error en checkout:", error)
+      
+      if (error instanceof SyntaxError && error.message.includes("Unexpected token")) {
+        await showAlert("Error del Servidor", "El servidor está devolviendo HTML en lugar de JSON. Esto suele indicar un error 500 en el backend. Por favor, revisa los logs del servidor.")
+      } else {
+        await showAlert("Error", "Ocurrió un error al procesar el pago: " + error.message)
+      }
     }
   }
 
