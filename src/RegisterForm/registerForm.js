@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertModal, useCustomModal } from '../Modal/modal';
+import { API_BASE_URL, setSession } from '../auth/auth';
+import { mergeGuestCartIntoUser } from '../Carrito/carrito';
 import './registerForm.css';
 
 const RegisterForm = () => {
@@ -20,7 +22,9 @@ const RegisterForm = () => {
   const { alertModal, showAlert, closeAlert } = useCustomModal();
 
   const navigate = useNavigate();
-  const API_URL = "https://aplicacioneswebbackend-git-dev-torosantiagos-projects.vercel.app/edp";
+  // API_URL ahora viene del helper de auth (centralizado, lee de
+  // REACT_APP_API_URL en build time).
+  const API_URL = API_BASE_URL;
 
   const handleChange = (e) => {
     setFormData({
@@ -93,9 +97,13 @@ const RegisterForm = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Guardar el token en localStorage
-        localStorage.setItem('auth_token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.usuario));
+        // Guardar sesión vía helper centralizado (dispara authChanged
+        // para que el Navbar muestre al usuario logueado).
+        setSession(data.token, data.usuario);
+
+        // Si el visitante había agregado cosas al carrito antes de registrarse,
+        // se las pasamos a su nuevo carrito personal.
+        mergeGuestCartIntoUser();
 
         await showAlert('¡Registro exitoso!', 'Bienvenido a nuestra tienda de perfumes.');
         navigate('/home');

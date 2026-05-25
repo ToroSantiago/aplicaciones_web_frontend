@@ -3,7 +3,61 @@
 import { useState, useEffect } from "react"
 import { X, Trash2, Plus, Minus } from "lucide-react"
 import { ConfirmModal, AlertModal, useCustomModal } from "../Modal/modal"
+import { getCurrentUser, onAuthChange } from "../auth/auth"
 import "./carrito.css"
+
+// ---------------------------------------------------------------------
+// Cart key namespacing
+// ---------------------------------------------------------------------
+// El carrito vive en localStorage bajo una key distinta según haya o no
+// haya sesión, para que el carrito del cliente persista entre sesiones
+// sin mezclarse con el de otro usuario que use el mismo navegador.
+//
+//   - Sin sesión: 'carrito_guest'
+//   - Logueado:   'carrito_<userId>'
+//
+// LEGACY_KEY es la clave antigua ('carrito'). Si existe, la migramos a
+// guest la primera vez que cargue el cliente (ver migrateLegacyCart()).
+// ---------------------------------------------------------------------
+const LEGACY_KEY = "carrito"
+const GUEST_KEY = "carrito_guest"
+
+const getCartKey = () => {
+  const user = getCurrentUser()
+  return user?.id ? `carrito_${user.id}` : GUEST_KEY
+}
+
+const readCartFrom = (key) => {
+  try {
+    const raw = localStorage.getItem(key)
+    if (!raw || raw === "null" || raw === "undefined") return []
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? parsed : []
+  } catch (e) {
+    console.error(`Error leyendo carrito ${key}:`, e)
+    return []
+  }
+}
+
+const writeCartTo = (key, items) => {
+  if (items.length > 0) {
+    localStorage.setItem(key, JSON.stringify(items))
+  } else {
+    localStorage.removeItem(key)
+  }
+}
+
+// Migra el carrito viejo (key 'carrito') a guest la primera vez que
+// cargue. Idempotente: si guest ya tiene items, no pisa nada.
+const migrateLegacyCart = () => {
+  const legacy = localStorage.getItem(LEGACY_KEY)
+  if (!legacy) return
+  if (!localStorage.getItem(GUEST_KEY)) {
+    localStorage.setItem(GUEST_KEY, legacy)
+  }
+  localStorage.removeItem(LEGACY_KEY)
+}
+migrateLegacyCart()
 
 const Carrito = ({ isOpen, onClose }) => {
   const [cartItems, setCartItems] = useState([])
@@ -12,54 +66,35 @@ const Carrito = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     const loadCartItems = () => {
-      try {
-        const savedCart = localStorage.getItem("carrito")
-        if (savedCart && savedCart !== "null" && savedCart !== "undefined") {
-          const parsedCart = JSON.parse(savedCart)
-          if (Array.isArray(parsedCart)) {
-            setCartItems(parsedCart)
-            calculateTotal(parsedCart)
-          } else {
-            setCartItems([])
-            setTotal(0)
-          }
-        } else {
-          setCartItems([])
-          setTotal(0)
-        }
-      } catch (error) {
-        console.error("Error loading cart:", error)
-        setCartItems([])
-        setTotal(0)
-      }
+      const items = readCartFrom(getCartKey())
+      setCartItems(items)
+      calculateTotal(items)
     }
 
     loadCartItems()
 
-    const handleStorageChange = () => {
-      loadCartItems()
-    }
-
-    window.addEventListener("storage", handleStorageChange)
-    window.addEventListener("cartUpdated", handleStorageChange)
+    // Recargar cuando cambie el storage (cross-tab), cuando se agregue
+    // algo al carrito en otro componente (cartUpdated), o cuando el
+    // usuario haga login/logout (authChanged → cambia la cart key).
+    window.addEventListener("storage", loadCartItems)
+    window.addEventListener("cartUpdated", loadCartItems)
+    const offAuth = onAuthChange(loadCartItems)
 
     return () => {
-      window.removeEventListener("storage", handleStorageChange)
-      window.removeEventListener("cartUpdated", handleStorageChange)
+      window.removeEventListener("storage", loadCartItems)
+      window.removeEventListener("cartUpdated", loadCartItems)
+      offAuth()
     }
   }, [])
 
   const updateCartAndNotify = (newCartItems) => {
-    if (newCartItems.length > 0) {
-      localStorage.setItem("carrito", JSON.stringify(newCartItems))
-    } else {
-      localStorage.removeItem("carrito")
-    }
+    const key = getCartKey()
+    writeCartTo(key, newCartItems)
 
     window.dispatchEvent(new CustomEvent("cartUpdated"))
     window.dispatchEvent(
       new StorageEvent("storage", {
-        key: "carrito",
+        key,
         newValue: newCartItems.length > 0 ? JSON.stringify(newCartItems) : null,
         storageArea: localStorage,
       }),
@@ -121,7 +156,7 @@ const Carrito = ({ isOpen, onClose }) => {
 
     if (confirmed) {
       setCartItems([])
-      localStorage.removeItem("carrito")
+      // updateCartAndNotify ya elimina la key actual cuando le pasas [].
       updateCartAndNotify([])
       await showAlert("Carrito Vaciado", "Se han eliminado todos los productos del carrito")
     }
@@ -353,15 +388,8 @@ export default Carrito
  */
 export const addToCart = async (product, quantity = 1, selectedVolume) => {
   try {
-    const savedCart = localStorage.getItem("carrito")
-    let currentCart = []
-
-    if (savedCart && savedCart !== "null" && savedCart !== "undefined") {
-      const parsedCart = JSON.parse(savedCart)
-      if (Array.isArray(parsedCart)) {
-        currentCart = parsedCart
-      }
-    }
+    const key = getCartKey()
+    let currentCart = readCartFrom(key)
 
     const varianteIdReal = product.variante_id || product.id
     const productId = `${product.id}-${selectedVolume}`
@@ -407,11 +435,11 @@ export const addToCart = async (product, quantity = 1, selectedVolume) => {
       currentCart.push(productToAdd)
     }
 
-    localStorage.setItem("carrito", JSON.stringify(currentCart))
+    writeCartTo(key, currentCart)
     window.dispatchEvent(new CustomEvent("cartUpdated"))
     window.dispatchEvent(
       new StorageEvent("storage", {
-        key: "carrito",
+        key,
         newValue: JSON.stringify(currentCart),
         storageArea: localStorage,
       }),
@@ -431,18 +459,8 @@ export const addToCart = async (product, quantity = 1, selectedVolume) => {
 
 export const getCartItemCount = () => {
   try {
-    const savedCart = localStorage.getItem("carrito")
-
-    if (!savedCart || savedCart === "null" || savedCart === "undefined") {
-      return 0
-    }
-
-    const cart = JSON.parse(savedCart)
-
-    if (!Array.isArray(cart) || cart.length === 0) {
-      return 0
-    }
-
+    const cart = readCartFrom(getCartKey())
+    if (cart.length === 0) return 0
     return cart.reduce((total, item) => {
       const cantidad = typeof item.cantidad === "number" ? item.cantidad : 0
       return total + cantidad
@@ -451,4 +469,40 @@ export const getCartItemCount = () => {
     console.error("Error getting cart count:", error)
     return 0
   }
+}
+
+/**
+ * Mergea el carrito guest con el del usuario (sumando cantidades para items
+ * iguales, respetando stock). Se llama después de un login exitoso para que
+ * el cliente no pierda lo que tenía en el carrito antes de loguearse.
+ *
+ * El carrito guest se vacía después del merge.
+ */
+export const mergeGuestCartIntoUser = () => {
+  const user = getCurrentUser()
+  if (!user?.id) return // no hay sesión, nada que mergear
+
+  const guestItems = readCartFrom(GUEST_KEY)
+  if (guestItems.length === 0) return
+
+  const userKey = `carrito_${user.id}`
+  const userItems = readCartFrom(userKey)
+
+  // Mergeamos por id (que es perfumeId-volumen) → suma de cantidades, capeada al stock.
+  const mergedById = new Map(userItems.map((it) => [it.id, { ...it }]))
+  for (const guestIt of guestItems) {
+    const existing = mergedById.get(guestIt.id)
+    if (existing) {
+      const cap = Math.max(existing.stock ?? 0, guestIt.stock ?? 0)
+      existing.cantidad = Math.min(existing.cantidad + guestIt.cantidad, cap)
+    } else {
+      mergedById.set(guestIt.id, { ...guestIt })
+    }
+  }
+  const merged = Array.from(mergedById.values())
+
+  writeCartTo(userKey, merged)
+  writeCartTo(GUEST_KEY, []) // vaciamos guest
+
+  window.dispatchEvent(new CustomEvent("cartUpdated"))
 }

@@ -1,0 +1,265 @@
+/* Página "Mis Compras" — diseño sobrio acorde al resto del SPA */
+
+.mc-container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+  color: #e9e9e9;
+}
+
+.mc-header {
+  margin-bottom: 24px;
+}
+
+.mc-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+  color: #f6c46a;
+}
+
+.mc-subtitle {
+  color: #b9b9b9;
+  margin: 0;
+}
+
+/* Estado vacío / loading / error */
+.mc-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 32px 24px;
+}
+
+.mc-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.mc-empty-icon {
+  color: #f6c46a;
+  opacity: 0.7;
+}
+
+.mc-error {
+  color: #ff6b6b;
+}
+
+.mc-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(246, 196, 106, 0.25);
+  border-top-color: #f6c46a;
+  border-radius: 50%;
+  animation: mcSpin 0.9s linear infinite;
+}
+
+@keyframes mcSpin {
+  to { transform: rotate(360deg); }
+}
+
+.mc-btn-primary {
+  background: #f6c46a;
+  color: #1a1a1a;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.mc-btn-primary:hover {
+  background: #e3b557;
+}
+
+/* Lista de ventas */
+.mc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mc-venta {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.mc-venta-summary {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.mc-venta-summary:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.mc-venta-summary-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.mc-venta-id {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.mc-venta-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: #b9b9b9;
+}
+
+.mc-venta-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mc-venta-summary-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mc-venta-total {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #f6c46a;
+  white-space: nowrap;
+}
+
+/* Badges de estado */
+.mc-badge {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: capitalize;
+  font-weight: 600;
+}
+
+.mc-badge-success {
+  background: rgba(46, 204, 113, 0.18);
+  color: #4ddb9b;
+}
+
+.mc-badge-warning {
+  background: rgba(241, 196, 15, 0.18);
+  color: #f5d765;
+}
+
+.mc-badge-danger {
+  background: rgba(215, 38, 56, 0.2);
+  color: #ff7286;
+}
+
+/* Items expandidos */
+.mc-venta-items {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mc-item {
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+}
+.mc-item:last-child { border-bottom: none; }
+
+.mc-item-thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.4);
+}
+.mc-item-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mc-item-info {
+  min-width: 0;
+}
+
+.mc-item-name {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.mc-item-name small {
+  color: #b9b9b9;
+  font-weight: 400;
+}
+
+.mc-item-meta {
+  font-size: 0.85rem;
+  color: #b9b9b9;
+}
+
+.mc-item-price {
+  text-align: right;
+}
+
+.mc-item-unit {
+  font-size: 0.8rem;
+  color: #b9b9b9;
+}
+
+.mc-item-subtotal {
+  font-weight: 700;
+  color: #f6c46a;
+}
+
+@media (max-width: 600px) {
+  .mc-venta-summary {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .mc-venta-summary-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .mc-item {
+    grid-template-columns: 48px 1fr;
+  }
+  .mc-item-thumb {
+    width: 48px;
+    height: 48px;
+  }
+  .mc-item-price {
+    grid-column: 1 / -1;
+    text-align: left;
+    border-top: 1px dashed rgba(255, 255, 255, 0.05);
+    padding-top: 6px;
+  }
+}

@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
+import { AlertModal, useCustomModal } from '../Modal/modal';
+import { API_BASE_URL, setSession } from '../auth/auth';
+import { mergeGuestCartIntoUser } from '../Carrito/carrito';
 import './authForms.css';
 
 const LoginForm = () => {
@@ -9,8 +12,8 @@ const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
-  const API_URL = "https://aplicacioneswebbackend-git-dev-torosantiagos-projects.vercel.app/edp";
+
+  const { alertModal, showAlert, closeAlert } = useCustomModal();
 
   const togglePassword = () => setShowPassword(!showPassword);
 
@@ -18,9 +21,9 @@ const LoginForm = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    
+
     try {
-      const response = await fetch(`${API_URL}/login`, {
+      const response = await fetch(`${API_BASE_URL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -31,21 +34,31 @@ const LoginForm = () => {
 
       const data = await response.json();
 
-      if (response.ok) {
-        // Guardar el token y datos del usuario
-        localStorage.setItem('auth_token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.usuario));
-        
-        // Redirigir según el rol
-        if (data.usuario.rol === 'Administrador') {
-          // Redirigir al panel de administración de Laravel
-          window.location.href = 'https://aplicacioneswebbackend-git-dev-torosantiagos-projects.vercel.app/dashboard';
-        } else {
-          navigate('/home');
-        }
-      } else {
+      if (!response.ok) {
         setError(data.error || 'Error al iniciar sesión');
+        return;
       }
+
+      // El SPA es solo para Clientes. Empleados/Administradores tienen su
+      // propio backoffice y se loguean por ahí. No guardamos token para no
+      // mezclar contextos.
+      if (data.usuario?.rol !== 'Cliente') {
+        await showAlert(
+          'Acceso restringido',
+          'Esta cuenta es de empleado/administrador. Por favor, accedé al backoffice.'
+        );
+        return;
+      }
+
+      // Cliente: guardamos token + usuario y disparamos evento authChanged
+      // para que el Navbar y el Carrito se actualicen.
+      setSession(data.token, data.usuario);
+
+      // Si el cliente tenía items en su carrito guest antes de loguearse,
+      // los pasamos a su carrito personal así no los pierde.
+      mergeGuestCartIntoUser();
+
+      navigate('/home');
     } catch (error) {
       console.error('Error:', error);
       setError('Error de conexión. Por favor intenta de nuevo.');
@@ -136,6 +149,13 @@ const LoginForm = () => {
           </div>
         </div>
       </div>
+
+      <AlertModal
+        isOpen={alertModal.isOpen}
+        title={alertModal.title}
+        message={alertModal.message}
+        onClose={closeAlert}
+      />
     </div>
   );
 };

@@ -1,64 +1,108 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Menu, X, ShoppingCart } from "lucide-react"
+import { useNavigate } from "react-router-dom"
+import { Menu, X, ShoppingCart, User, LogIn, LogOut, UserPlus, Receipt } from "lucide-react"
+import { AlertModal, useCustomModal } from "../Modal/modal"
+import Carrito, { getCartItemCount } from "../Carrito/carrito"
+import { getCurrentUser, isLoggedIn, isCliente, logout, onAuthChange } from "../auth/auth"
 import "./Navbar.css"
-import Carrito from "../Carrito/carrito"
-import { getCartItemCount } from "../Carrito/carrito"
 
 const Navbar = () => {
+  const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [cartItemCount, setCartItemCount] = useState(0)
 
-  // Actualizar contador de carrito
+  // Estado de sesión que dispara re-render del Navbar cuando cambia.
+  // Lo mantenemos en useState para que React reaccione; el dato real
+  // vive en localStorage y se sincroniza vía el evento authChanged.
+  const [user, setUser] = useState(getCurrentUser())
+  const loggedIn = isLoggedIn() && Boolean(user)
+  const clienteLogged = loggedIn && isCliente()
+
+  // Modal compartido para el aviso de "sesión cerrada"
+  const { alertModal, showAlert, closeAlert } = useCustomModal()
+
+  // Sincronización con localStorage + eventos custom
   useEffect(() => {
-    const updateCartCount = () => {
-      const count = getCartItemCount()
-      setCartItemCount(count)
+    const refresh = () => {
+      setCartItemCount(getCartItemCount())
+      setUser(getCurrentUser())
     }
+    refresh()
 
-    updateCartCount()
-
-    const handleCartUpdate = () => {
-      updateCartCount()
-    }
-
-    window.addEventListener("storage", handleCartUpdate)
-    window.addEventListener("cartUpdated", handleCartUpdate)
-    window.addEventListener("focus", handleCartUpdate)
+    window.addEventListener("storage", refresh)
+    window.addEventListener("cartUpdated", refresh)
+    window.addEventListener("focus", refresh)
+    const offAuth = onAuthChange(refresh)
 
     return () => {
-      window.removeEventListener("storage", handleCartUpdate)
-      window.removeEventListener("cartUpdated", handleCartUpdate)
-      window.removeEventListener("focus", handleCartUpdate)
+      window.removeEventListener("storage", refresh)
+      window.removeEventListener("cartUpdated", refresh)
+      window.removeEventListener("focus", refresh)
+      offAuth()
     }
   }, [])
 
   useEffect(() => {
+    // Al cerrar el carrito refrescamos el contador (puede haber bajado).
     if (!isCartOpen) {
-      const count = getCartItemCount()
-      setCartItemCount(count)
+      setCartItemCount(getCartItemCount())
     }
   }, [isCartOpen])
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen)
-  }
+  const closeMobileMenu = () => setIsMenuOpen(false)
+
+  const toggleMenu = () => setIsMenuOpen((v) => !v)
 
   const toggleCart = () => {
-    setIsCartOpen(!isCartOpen)
-    setIsMenuOpen(false)
+    setIsCartOpen((v) => !v)
+    closeMobileMenu()
   }
 
-  const handleHomeNavigation = () => {
-    // Si estás usando React Router, descomenta la siguiente línea:
-    // navigate("/")
-    // Si estás usando Next.js, puedes usar:
-    // router.push("/")
-    // Por ahora, simplemente recarga la página o redirige:
-    window.location.href = "/"
-    setIsMenuOpen(false)
+  const goTo = (path) => {
+    navigate(path)
+    closeMobileMenu()
+  }
+
+  const handleLogout = async () => {
+    await logout()
+    await showAlert("Sesión cerrada", "Hasta la próxima.")
+    navigate("/")
+  }
+
+  // ----- Render de los botones de sesión (lo reuso en desktop y mobile) -----
+  const renderAuthButtons = (isMobile = false) => {
+    const cls = isMobile ? "mobile-nav-btn" : "nav-btn"
+    const secondary = isMobile ? "mobile-nav-btn-secondary" : "nav-btn-secondary"
+
+    if (clienteLogged) {
+      return (
+        <>
+          <span className={`${cls} ${secondary} user-greet`} title={user.email}>
+            <User size={16} /> Hola, {user.nombre}
+          </span>
+          <button className={`${cls} ${secondary}`} onClick={() => goTo("/mis-compras")}>
+            <Receipt size={16} /> Mis compras
+          </button>
+          <button className={`${cls} ${secondary}`} onClick={handleLogout}>
+            <LogOut size={16} /> Cerrar sesión
+          </button>
+        </>
+      )
+    }
+
+    return (
+      <>
+        <button className={`${cls} ${secondary}`} onClick={() => goTo("/authForm")}>
+          <LogIn size={16} /> Iniciar sesión
+        </button>
+        <button className={`${cls} ${secondary}`} onClick={() => goTo("/register")}>
+          <UserPlus size={16} /> Registrarse
+        </button>
+      </>
+    )
   }
 
   return (
@@ -66,12 +110,13 @@ const Navbar = () => {
       <nav className="custom-navbar">
         <div className="navbar-container">
           <div className="navbar-brand-container">
-            <button onClick={handleHomeNavigation} className="navbar-brand-btn">
+            <button onClick={() => goTo("/")} className="navbar-brand-btn">
               Essenza Royale
             </button>
           </div>
 
           <div className="desktop-menu">
+            {renderAuthButtons(false)}
             <button onClick={toggleCart} className="nav-btn nav-btn-secondary cart-btn" aria-label="Ver carrito">
               <div className="cart-icon-container">
                 <ShoppingCart size={16} />
@@ -90,6 +135,7 @@ const Navbar = () => {
 
         <div className={`mobile-menu ${isMenuOpen ? "mobile-menu-open" : ""}`}>
           <div className="mobile-menu-content">
+            {renderAuthButtons(true)}
             <button
               onClick={toggleCart}
               className="mobile-nav-btn mobile-nav-btn-secondary cart-btn"
@@ -106,6 +152,13 @@ const Navbar = () => {
       </nav>
 
       <Carrito isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+
+      <AlertModal
+        isOpen={alertModal.isOpen}
+        title={alertModal.title}
+        message={alertModal.message}
+        onClose={closeAlert}
+      />
     </>
   )
 }

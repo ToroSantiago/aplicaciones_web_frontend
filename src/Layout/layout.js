@@ -4,8 +4,9 @@ import Navbar from '../Navbar/Navbar';
 import Body from '../Body/Body';
 import AuthForm from '../AuthForms/authForms';
 import RegisterForm from '../RegisterForm/registerForm';
-import Success from '../pages/Success'; // Agregar este import
-import Failed from '../pages/Failed';   // Agregar este import
+import Success from '../pages/Success';
+import Failed from '../pages/Failed';
+import MisCompras from '../MisCompras/MisCompras';
 import Footer from '../Footer/Footer';
 
 const Layout = () => {
@@ -20,9 +21,11 @@ const Layout = () => {
         return <AuthForm />;
       case '/register':
         return <RegisterForm />;
-      case '/success':           // Agregar este caso
+      case '/mis-compras':
+        return <MisCompras />;
+      case '/success':
         return <Success />;
-      case '/failed':            // Agregar este caso
+      case '/failed':
         return <Failed />;
       default:
         return <div className="container mt-5">Página no encontrada</div>;
