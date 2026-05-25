@@ -417,3 +417,46 @@
     justify-self: end;
   }
 }
+
+/* ============================================
+   Descuentos en el carrito: tachado, badge y
+   línea "te ahorrás" del resumen.
+   ============================================ */
+
+/* Precio original tachado por encima del precio final */
+.carrito-item-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.carrito-item-price-original {
+  text-decoration: line-through;
+  color: #888;
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+
+.carrito-item-discount-badge {
+  background: #d72638;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.7rem;
+  padding: 2px 7px;
+  border-radius: 999px;
+  letter-spacing: 0.4px;
+}
+
+/* "Te ahorrás $XYZ" en el resumen, debajo del subtotal y arriba del total */
+.carrito-savings {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #2a9d4f;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 4px 0;
+  border-top: 1px dashed rgba(0, 0, 0, 0.1);
+  margin-bottom: 4px;
+}

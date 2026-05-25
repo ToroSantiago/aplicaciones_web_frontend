@@ -257,7 +257,19 @@ const Carrito = ({ isOpen, onClose }) => {
                           <Plus size={16} />
                         </button>
                       </div>
-                      <div className="carrito-item-price">${(item.precio * item.cantidad).toLocaleString("es-AR")}</div>
+                      <div className="carrito-item-price">
+                        {item.tiene_descuento && item.precio_original > item.precio && (
+                          <div className="carrito-item-price-original">
+                            ${(item.precio_original * item.cantidad).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </div>
+                        )}
+                        <div>${(item.precio * item.cantidad).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                        {item.tiene_descuento && (
+                          <span className="carrito-item-discount-badge">
+                            -{Math.round(item.descuento_porcentaje)}%
+                          </span>
+                        )}
+                      </div>
                       <button className="carrito-item-remove" onClick={() => removeItem(item.variante_id)}>
                         <Trash2 size={18} />
                       </button>
@@ -267,9 +279,25 @@ const Carrito = ({ isOpen, onClose }) => {
 
                 <div className="carrito-footer">
                   <div className="carrito-summary">
+                    {(() => {
+                      // Si algún item del carrito tiene descuento, mostramos
+                      // cuánto se está ahorrando el cliente vs. precios originales.
+                      const totalOriginal = cartItems.reduce(
+                        (acc, it) => acc + (it.precio_original ?? it.precio) * it.cantidad,
+                        0
+                      )
+                      const ahorro = totalOriginal - total
+                      if (ahorro <= 0.01) return null
+                      return (
+                        <div className="carrito-savings">
+                          <span>Te ahorrás:</span>
+                          <span>${ahorro.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                      )
+                    })()}
                     <div className="carrito-total">
                       <span>Total:</span>
-                      <span>${total.toLocaleString("es-AR")}</span>
+                      <span>${total.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                   </div>
                   <div className="carrito-actions">
@@ -370,7 +398,15 @@ export const addToCart = async (product, quantity = 1, selectedVolume) => {
       variante_id: varianteIdReal,
       nombre: product.nombre,
       marca: product.marca,
+      // `precio` guarda el precio efectivo (precio_final si hay descuento
+      // vigente). Es el que se usa para totales y se envía a MP como unit_price.
       precio: product.precio,
+      // Campos opcionales solo para mostrar el tachado y badge en el carrito.
+      // Si vienen undefined (items viejos en localStorage), el UI los trata
+      // como "sin descuento".
+      precio_original: product.precio_original ?? product.precio,
+      tiene_descuento: !!product.tiene_descuento,
+      descuento_porcentaje: Number.parseFloat(product.descuento_porcentaje ?? 0),
       imagen_url: product.imagen_url,
       volumen: selectedVolume,
       cantidad: quantity,

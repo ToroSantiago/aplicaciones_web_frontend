@@ -159,6 +159,49 @@ const Body = () => {
     return selectedPerfume.variantes.find((v) => v.volumen.toString() === selectedVolume)
   }
 
+  // Helpers de precio con descuento.
+  // El backend devuelve por variante: precio (original), precio_final
+  // (con descuento aplicado), tiene_descuento (bool), descuento_porcentaje.
+  // Estos helpers normalizan el acceso y formatean para mostrar.
+  const formatPrice = (n) =>
+    Number.parseFloat(n).toLocaleString("es-AR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+
+  // Precio "real" que se va a cobrar (precio_final si hay descuento, sino el normal)
+  const getVariantPrice = (variant) =>
+    Number.parseFloat(variant?.precio_final ?? variant?.precio ?? 0)
+
+  // Datos de descuento agregados a nivel perfume (para la card del catálogo).
+  // Calcula min/max sobre precio_final para reflejar el rango real que paga
+  // el cliente, no el rango original.
+  const getPerfumeDiscountSummary = (perfume) => {
+    const variantes = perfume?.variantes ?? []
+    if (variantes.length === 0) {
+      return {
+        algunoConDescuento: false,
+        minOriginal: Number.parseFloat(perfume?.precio_minimo ?? 0),
+        maxOriginal: Number.parseFloat(perfume?.precio_maximo ?? 0),
+        minFinal: Number.parseFloat(perfume?.precio_minimo ?? 0),
+        maxFinal: Number.parseFloat(perfume?.precio_maximo ?? 0),
+        maxPorcentaje: 0,
+      }
+    }
+    const originales = variantes.map((v) => Number.parseFloat(v.precio ?? 0))
+    const finales = variantes.map((v) => getVariantPrice(v))
+    return {
+      algunoConDescuento: variantes.some((v) => v.tiene_descuento),
+      minOriginal: Math.min(...originales),
+      maxOriginal: Math.max(...originales),
+      minFinal: Math.min(...finales),
+      maxFinal: Math.max(...finales),
+      maxPorcentaje: Math.max(
+        ...variantes.map((v) => Number.parseFloat(v.descuento_porcentaje ?? 0))
+      ),
+    }
+  }
+
   // Componente de filtros reutilizable
   const FilterContent = () => (
     <>
@@ -290,7 +333,9 @@ const Body = () => {
                   </div>
                 </div>
               ) : (
-                filteredPerfumes.map((perfume) => (
+                filteredPerfumes.map((perfume) => {
+                  const discountInfo = getPerfumeDiscountSummary(perfume)
+                  return (
                   <div key={perfume.id} className="col-xl-4 col-lg-6 col-md-6 col-mobile-6">
                     <div
                       className={`luxury-product-card ${perfume.hay_stock ? "luxury-product-clickable" : "luxury-product-disabled"}`}
@@ -304,6 +349,11 @@ const Body = () => {
                           className="luxury-product-image"
                           alt={perfume.nombre}
                         />
+                        {discountInfo.algunoConDescuento && (
+                          <span className="luxury-discount-badge">
+                            -{Math.round(discountInfo.maxPorcentaje)}%
+                          </span>
+                        )}
                       </div>
                       <div className="luxury-product-body">
                         <div className="luxury-product-header">
@@ -319,10 +369,13 @@ const Body = () => {
                           </div>
 
                           <div className="luxury-product-price">
+                            {discountInfo.algunoConDescuento && discountInfo.minOriginal !== discountInfo.minFinal && (
+                              <span className="luxury-price-original">
+                                ${formatPrice(discountInfo.minOriginal)}
+                              </span>
+                            )}
                             <span className="luxury-price-value">
-                              {perfume.precio_minimo === perfume.precio_maximo
-                                ? `$${Number.parseFloat(perfume.precio_minimo).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                                : `$${Number.parseFloat(perfume.precio_minimo).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                              ${formatPrice(discountInfo.minFinal)}
                             </span>
                           </div>
 
@@ -336,7 +389,8 @@ const Body = () => {
                       </div>
                     </div>
                   </div>
-                ))
+                  )
+                })
               )}
             </div>
           </div>
@@ -418,11 +472,8 @@ const Body = () => {
                       </option>
                       {selectedPerfume.variantes?.map((variant) => (
                         <option key={variant.volumen} value={variant.volumen} disabled={variant.stock === 0}>
-                          {variant.volumen}ml - $
-                          {Number.parseFloat(variant.precio).toLocaleString("es-AR", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}
+                          {variant.volumen}ml - ${formatPrice(getVariantPrice(variant))}
+                          {variant.tiene_descuento ? ` (-${Math.round(Number.parseFloat(variant.descuento_porcentaje))}%)` : ""}
                           {variant.stock === 0 ? " (Sin stock)" : ""}
                         </option>
                       ))}
@@ -431,12 +482,20 @@ const Body = () => {
 
                   {getSelectedVariant() && (
                     <div className="luxury-detail-selected-info">
-                      <div className="luxury-detail-price">
-                        $
-                        {Number.parseFloat(getSelectedVariant().precio).toLocaleString("es-AR", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
+                      <div className="luxury-detail-price-wrapper">
+                        {getSelectedVariant().tiene_descuento && (
+                          <>
+                            <span className="luxury-detail-price-original">
+                              ${formatPrice(getSelectedVariant().precio)}
+                            </span>
+                            <span className="luxury-detail-discount-badge">
+                              -{Math.round(Number.parseFloat(getSelectedVariant().descuento_porcentaje))}%
+                            </span>
+                          </>
+                        )}
+                        <div className="luxury-detail-price">
+                          ${formatPrice(getVariantPrice(getSelectedVariant()))}
+                        </div>
                       </div>
 
                       <div
@@ -453,12 +512,20 @@ const Body = () => {
                         disabled={getSelectedVariant().stock === 0}
                         onClick={() => {
                           if (getSelectedVariant().stock > 0) {
-                            // Crear un producto con el precio correcto según el volumen seleccionado
+                            // Crear un producto con el precio correcto según el volumen seleccionado.
+                            // `precio` guarda el precio_final (con descuento si aplica) — es el
+                            // que se usa para totales y para mandar al checkout.
+                            // `precio_original` y los campos de descuento se guardan para mostrar
+                            // el tachado en el carrito.
+                            const variantSel = getSelectedVariant()
                             const productToAdd = {
                               ...selectedPerfume,
-                              precio: Number.parseFloat(getSelectedVariant().precio), // Asegurar que sea número
-                              volumen: getSelectedVariant().volumen,
-                              stock: getSelectedVariant().stock,
+                              precio: getVariantPrice(variantSel),
+                              precio_original: Number.parseFloat(variantSel.precio),
+                              tiene_descuento: !!variantSel.tiene_descuento,
+                              descuento_porcentaje: Number.parseFloat(variantSel.descuento_porcentaje ?? 0),
+                              volumen: variantSel.volumen,
+                              stock: variantSel.stock,
                             }
 
                             // Agregar al carrito usando la función importada

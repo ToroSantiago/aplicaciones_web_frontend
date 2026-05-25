@@ -1258,3 +1258,62 @@ html {
     font-size: 0.9rem;
   }
 }
+/* ============================================
+   Descuentos: badges, precios tachados, etc.
+   Agregado por el feature de descuentos por
+   variante (matchea el precio_final que
+   devuelve el backend en cada perfume).
+   ============================================ */
+
+/* Badge "-XX%" sobre la imagen del producto en la card */
+.luxury-product-image-container {
+  position: relative;
+}
+
+.luxury-discount-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #d72638;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  letter-spacing: 0.5px;
+  z-index: 2;
+}
+
+/* Precio original tachado al lado / sobre el precio final */
+.luxury-price-original {
+  text-decoration: line-through;
+  color: #888;
+  font-size: 0.9rem;
+  margin-right: 8px;
+}
+
+/* En el modal de detalle: bloque que envuelve original + final */
+.luxury-detail-price-wrapper {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.luxury-detail-price-original {
+  text-decoration: line-through;
+  color: #888;
+  font-size: 1rem;
+}
+
+.luxury-detail-discount-badge {
+  background: #d72638;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 3px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.4px;
+}
