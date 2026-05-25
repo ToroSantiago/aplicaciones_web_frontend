@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react"
 import { X, Trash2, Plus, Minus } from "lucide-react"
 import { ConfirmModal, AlertModal, useCustomModal } from "../Modal/modal"
-import { getCurrentUser, onAuthChange } from "../auth/auth"
+import { useNavigate } from "react-router-dom"
+import { API_BASE_URL, fetchAuth, getCurrentUser, isCliente, onAuthChange } from "../auth/auth"
 import "./carrito.css"
 
 // ---------------------------------------------------------------------
@@ -60,6 +61,7 @@ const migrateLegacyCart = () => {
 migrateLegacyCart()
 
 const Carrito = ({ isOpen, onClose }) => {
+  const navigate = useNavigate()
   const [cartItems, setCartItems] = useState([])
   const [total, setTotal] = useState(0)
   const { confirmModal, alertModal, showConfirm, showAlert, closeAlert } = useCustomModal()
@@ -166,6 +168,22 @@ const Carrito = ({ isOpen, onClose }) => {
   const handleCheckout = async () => {
     if (cartItems.length === 0) return
 
+    // Para checkout tenés que estar logueado como Cliente: la venta se
+    // asigna al usuario autenticado vía Bearer token. Antes mandabamos un
+    // payer hardcodeado y todas las ventas terminaban en un mismo usuario fake.
+    const user = getCurrentUser()
+    if (!user || !isCliente()) {
+      const confirmedLogin = await showConfirm(
+        "Tenés que iniciar sesión",
+        "Para finalizar la compra necesitás estar logueado como cliente. ¿Querés ir al login?"
+      )
+      if (confirmedLogin) {
+        onClose()
+        navigate("/authForm")
+      }
+      return
+    }
+
     const confirmed = await showConfirm("Confirmar Compra", "¿Estás seguro de que quieres proceder con la compra?")
     if (!confirmed) return
 
@@ -177,22 +195,21 @@ const Carrito = ({ isOpen, onClose }) => {
         unit_price: parseFloat(item.precio),
       }))
 
+      // payer = datos del cliente logueado. El backend igualmente usa el
+      // Bearer token para asignar la venta (defensa en profundidad).
       const payer = {
-        name: "Cliente",
-        surname: "Invitado",
-        email: "test_user_646915520@testuser.com",
+        name: user.nombre,
+        surname: user.apellido,
+        email: user.email,
       }
 
       const requestBody = { items: mpItems, payer }
-      
+
       console.log("🚀 Enviando request:", JSON.stringify(requestBody, null, 2))
 
-      const response = await fetch("https://aplicacioneswebbackend-git-dev-torosantiagos-projects.vercel.app/edp/checkout", {
+      // fetchAuth agrega Authorization: Bearer <token> automáticamente.
+      const response = await fetchAuth(`${API_BASE_URL}/checkout`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json", // Importante: especificar que esperamos JSON
-        },
         body: JSON.stringify(requestBody),
       })
 
