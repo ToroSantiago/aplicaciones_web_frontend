@@ -36,9 +36,30 @@ const Body = () => {
     fetchPerfumes()
   }, [])
 
-  // Aplicar filtros cuando cambien los filtros o los perfumes
+  // Aplicar filtros cuando cambien los filtros o los perfumes.
+  // La lógica vive inline acá (en vez de en una función separada) para que
+  // eslint-plugin-react-hooks pueda chequear correctamente las dependencias.
   useEffect(() => {
-    applyFilters()
+    let filtered = [...perfumes]
+
+    if (filters.genero) {
+      filtered = filtered.filter((perfume) => perfume.genero === filters.genero)
+    }
+    if (filters.volumen) {
+      filtered = filtered.filter(
+        (perfume) => perfume.variantes && perfume.variantes.some((v) => v.volumen === Number.parseInt(filters.volumen)),
+      )
+    }
+    if (filters.marca) {
+      filtered = filtered.filter((perfume) => perfume.marca.toLowerCase().includes(filters.marca.toLowerCase()))
+    }
+    if (filters.ordenPrecio === "menor") {
+      filtered.sort((a, b) => (a.precio_minimo || 0) - (b.precio_minimo || 0))
+    } else if (filters.ordenPrecio === "mayor") {
+      filtered.sort((a, b) => (b.precio_maximo || 0) - (a.precio_maximo || 0))
+    }
+
+    setFilteredPerfumes(filtered)
   }, [filters, perfumes])
 
   const fetchPerfumes = async () => {
@@ -63,36 +84,6 @@ const Body = () => {
     } finally {
       setLoading(false)
     }
-  }
-
-  const applyFilters = () => {
-    let filtered = [...perfumes]
-
-    // Filtro por género
-    if (filters.genero) {
-      filtered = filtered.filter((perfume) => perfume.genero === filters.genero)
-    }
-
-    // Filtro por volumen - ahora filtramos por variantes disponibles
-    if (filters.volumen) {
-      filtered = filtered.filter(
-        (perfume) => perfume.variantes && perfume.variantes.some((v) => v.volumen === Number.parseInt(filters.volumen)),
-      )
-    }
-
-    // Filtro por marca
-    if (filters.marca) {
-      filtered = filtered.filter((perfume) => perfume.marca.toLowerCase().includes(filters.marca.toLowerCase()))
-    }
-
-    // Ordenar por precio (usando precio mínimo)
-    if (filters.ordenPrecio === "menor") {
-      filtered.sort((a, b) => (a.precio_minimo || 0) - (b.precio_minimo || 0))
-    } else if (filters.ordenPrecio === "mayor") {
-      filtered.sort((a, b) => (b.precio_maximo || 0) - (a.precio_maximo || 0))
-    }
-
-    setFilteredPerfumes(filtered)
   }
 
   const handleFilterChange = (filterName, value) => {

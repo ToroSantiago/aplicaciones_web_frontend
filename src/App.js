@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './Layout/layout';
-import Footer from './Footer/Footer';
+// Footer ya se renderiza dentro de Layout — no se importa acá.
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const App = () => {

@@ -54,9 +54,8 @@ const LoginForm = () => {
     }
   };
 
-  const handleGoogleLogin = () => {
-    console.log('Google login clicked');
-  };
+  // TODO: login con Google — la integración con Google OAuth/Sanctum
+  // está sin implementar. Cuando se haga, agregar el botón y handler acá.
 
   const handleRegister = () => {
     navigate('/register'); 

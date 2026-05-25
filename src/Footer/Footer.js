@@ -19,11 +19,9 @@ const Footer = () => {
     },
   }
 
-  const socialLinks = [
-    { name: "Instagram", icon: "📷", url: "#" },
-    { name: "Facebook", icon: "📘", url: "#" },
-    { name: "WhatsApp", icon: "💬", url: `https://wa.me/${contactInfo.whatsapp.replace(/[^0-9]/g, "")}` },
-  ]
+  // TODO: las redes sociales (Instagram, Facebook, WhatsApp) todavía no se
+  // renderizan en el footer. Cuando se agregue la sección, definir el array
+  // socialLinks acá y mapearlo en el JSX.
 
   return (
     <footer className="luxury-footer">
