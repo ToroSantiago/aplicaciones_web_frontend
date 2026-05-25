@@ -17,9 +17,26 @@ const USER_KEY = "user"
 
 // URL base del backend. Centralizada acá: si en el futuro alguien la
 // necesita en mas lugares, importamos esta constante en vez de hardcodear.
-export const API_BASE_URL =
+//
+// IMPORTANTE: la API vive bajo el prefijo /edp (definido en bootstrap/app.php
+// del backend con apiPrefix). Si REACT_APP_API_URL llega solo con el host,
+// le agregamos /edp para evitar que las llamadas caigan en las rutas Blade
+// (web.php) y revienten con CSRF mismatch.
+const API_URL_RAW =
   process.env.REACT_APP_API_URL ||
   "https://aplicacioneswebbackend-git-dev-torosantiagos-projects.vercel.app/edp"
+
+const ensureApiPrefix = (url) => {
+  const clean = url.replace(/\/+$/, "") // sin trailing slash
+  if (clean.endsWith("/edp")) return clean
+  console.warn(
+    `[auth] REACT_APP_API_URL "${url}" no termina en /edp — agrego el prefijo. ` +
+      `Considera actualizar el .env para apuntar a .../edp explicitamente.`
+  )
+  return `${clean}/edp`
+}
+
+export const API_BASE_URL = ensureApiPrefix(API_URL_RAW)
 
 /**
  * Devuelve el usuario actual desde localStorage, o null si no hay sesión
