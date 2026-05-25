@@ -338,6 +338,19 @@ export default Carrito
 
 // --- Funciones auxiliares exportadas para uso externo ---
 
+/**
+ * Agrega un producto al carrito en localStorage.
+ *
+ * Devuelve { ok, error?, message?, cart } para que el componente que lo
+ * invoque maneje los avisos al usuario con su propio sistema de modales.
+ * Antes esta función pintaba un modal manipulando el DOM directamente
+ * (document.createElement), lo cual rompía la cohesión con el resto de
+ * la UI y mezclaba responsabilidades.
+ *
+ * Códigos de error posibles:
+ *   - 'STOCK_INSUFFICIENT': la cantidad pedida supera el stock disponible.
+ *   - 'EXCEPTION': error inesperado (problema con localStorage, JSON, etc.).
+ */
 export const addToCart = async (product, quantity = 1, selectedVolume) => {
   try {
     const savedCart = localStorage.getItem("carrito")
@@ -360,37 +373,12 @@ export const addToCart = async (product, quantity = 1, selectedVolume) => {
     const nuevaCantidad = cantidadActualEnCarrito + quantity
 
     if (nuevaCantidad > stockDisponible) {
-      // Crear y mostrar modal de alerta personalizado
-      const alertModal = document.createElement("div")
-      alertModal.innerHTML = `
-        <div class="custom-modal-overlay">
-          <div class="custom-modal alert-modal">
-            <div class="custom-modal-header">
-              <h3 class="custom-modal-title">Stock Insuficiente</h3>
-            </div>
-            <div class="custom-modal-content">
-              <div class="custom-modal-icon">⚠️</div>
-              <p class="custom-modal-message">¡Solo hay ${stockDisponible} unidades disponibles de ${product.nombre} ${selectedVolume}ml!</p>
-            </div>
-            <div class="custom-modal-actions">
-              <button class="custom-modal-btn confirm-btn">Aceptar</button>
-            </div>
-          </div>
-        </div>
-      `
-      document.body.appendChild(alertModal)
-
-      alertModal.querySelector(".confirm-btn").onclick = () => {
-        document.body.removeChild(alertModal)
+      return {
+        ok: false,
+        error: "STOCK_INSUFFICIENT",
+        message: `Solo hay ${stockDisponible} unidades disponibles de ${product.nombre} ${selectedVolume}ml.`,
+        cart: currentCart,
       }
-
-      alertModal.querySelector(".custom-modal-overlay").onclick = (e) => {
-        if (e.target === alertModal.querySelector(".custom-modal-overlay")) {
-          document.body.removeChild(alertModal)
-        }
-      }
-
-      return currentCart
     }
 
     const productToAdd = {
@@ -429,10 +417,15 @@ export const addToCart = async (product, quantity = 1, selectedVolume) => {
       }),
     )
 
-    return currentCart
+    return { ok: true, cart: currentCart }
   } catch (error) {
     console.error("Error adding to cart:", error)
-    return []
+    return {
+      ok: false,
+      error: "EXCEPTION",
+      message: "Ocurrió un error inesperado al agregar el producto al carrito.",
+      cart: [],
+    }
   }
 }
 

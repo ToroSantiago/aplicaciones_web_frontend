@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import "./Body.css"
 import { addToCart } from "../Carrito/carrito"
+import { AlertModal, useCustomModal } from "../Modal/modal"
 
 const Body = () => {
   const [perfumes, setPerfumes] = useState([])
@@ -10,6 +11,10 @@ const Body = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+
+  // Hook de modales propios (reemplaza alert() nativo y el modal hecho con
+  // document.createElement que tenía addToCart antes).
+  const { alertModal, showAlert, closeAlert } = useCustomModal()
 
   // Estados para el modal de detalles
   const [selectedPerfume, setSelectedPerfume] = useState(null)
@@ -510,33 +515,42 @@ const Body = () => {
                       <button
                         className={`luxury-detail-add-button ${getSelectedVariant().stock === 0 ? "luxury-detail-add-button-disabled" : ""}`}
                         disabled={getSelectedVariant().stock === 0}
-                        onClick={() => {
-                          if (getSelectedVariant().stock > 0) {
-                            // Crear un producto con el precio correcto según el volumen seleccionado.
-                            // `precio` guarda el precio_final (con descuento si aplica) — es el
-                            // que se usa para totales y para mandar al checkout.
-                            // `precio_original` y los campos de descuento se guardan para mostrar
-                            // el tachado en el carrito.
-                            const variantSel = getSelectedVariant()
-                            const productToAdd = {
-                              ...selectedPerfume,
-                              precio: getVariantPrice(variantSel),
-                              precio_original: Number.parseFloat(variantSel.precio),
-                              tiene_descuento: !!variantSel.tiene_descuento,
-                              descuento_porcentaje: Number.parseFloat(variantSel.descuento_porcentaje ?? 0),
-                              volumen: variantSel.volumen,
-                              stock: variantSel.stock,
-                            }
+                        onClick={async () => {
+                          if (getSelectedVariant().stock <= 0) return
 
-                            // Agregar al carrito usando la función importada
-                            addToCart(productToAdd, 1, Number.parseInt(selectedVolume))
-
-                            // Mostrar mensaje de confirmación más detallado
-                            alert(`✅ ${selectedPerfume.nombre} (${selectedVolume}ml) agregado al carrito exitosamente`)
-
-                            // Cerrar el modal
-                            closeDetailModal()
+                          // Crear un producto con el precio correcto según el volumen seleccionado.
+                          // `precio` guarda el precio_final (con descuento si aplica) — es el
+                          // que se usa para totales y para mandar al checkout.
+                          // `precio_original` y los campos de descuento se guardan para mostrar
+                          // el tachado en el carrito.
+                          const variantSel = getSelectedVariant()
+                          const productToAdd = {
+                            ...selectedPerfume,
+                            precio: getVariantPrice(variantSel),
+                            precio_original: Number.parseFloat(variantSel.precio),
+                            tiene_descuento: !!variantSel.tiene_descuento,
+                            descuento_porcentaje: Number.parseFloat(variantSel.descuento_porcentaje ?? 0),
+                            volumen: variantSel.volumen,
+                            stock: variantSel.stock,
                           }
+
+                          // addToCart ahora devuelve { ok, error?, message? }. El UI
+                          // decide si abrir un modal de éxito o uno de error.
+                          const result = await addToCart(productToAdd, 1, Number.parseInt(selectedVolume))
+
+                          if (!result.ok) {
+                            await showAlert(
+                              result.error === "STOCK_INSUFFICIENT" ? "Stock insuficiente" : "No se pudo agregar",
+                              result.message
+                            )
+                            return
+                          }
+
+                          closeDetailModal()
+                          await showAlert(
+                            "Agregado al carrito",
+                            `${selectedPerfume.nombre} (${selectedVolume}ml) se agregó al carrito.`
+                          )
                         }}
                       >
                         {getSelectedVariant().stock === 0 ? "Sin Stock" : "Agregar al Carrito"}
@@ -549,6 +563,14 @@ const Body = () => {
           </div>
         </div>
       )}
+
+      {/* Alert modal compartido para avisos (agregado al carrito, errores, etc.) */}
+      <AlertModal
+        isOpen={alertModal.isOpen}
+        title={alertModal.title}
+        message={alertModal.message}
+        onClose={closeAlert}
+      />
     </div>
   )
 }

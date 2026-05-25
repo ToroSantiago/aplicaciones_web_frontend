@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AlertModal, useCustomModal } from '../Modal/modal';
 import './registerForm.css';
 
 const RegisterForm = () => {
@@ -14,7 +15,10 @@ const RegisterForm = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
-  
+
+  // Modales propios (reemplaza los alert() nativos del registro).
+  const { alertModal, showAlert, closeAlert } = useCustomModal();
+
   const navigate = useNavigate();
   const API_URL = "https://aplicacioneswebbackend-git-dev-torosantiagos-projects.vercel.app/edp";
 
@@ -92,22 +96,23 @@ const RegisterForm = () => {
         // Guardar el token en localStorage
         localStorage.setItem('auth_token', data.token);
         localStorage.setItem('user', JSON.stringify(data.usuario));
-        
-        alert('¡Registro exitoso! Bienvenido a nuestra tienda de perfumes.');
+
+        await showAlert('¡Registro exitoso!', 'Bienvenido a nuestra tienda de perfumes.');
         navigate('/home');
       } else {
-        // Manejar errores de validación del servidor
+        // Errores de validación del servidor → se muestran inline en cada campo.
+        // El resto va por modal.
         if (data.errors) {
           setErrors(data.errors);
         } else if (data.message) {
-          alert(data.message);
+          await showAlert('No se pudo registrar', data.message);
         } else {
-          alert('Error en el registro. Por favor intenta de nuevo.');
+          await showAlert('No se pudo registrar', 'Error en el registro. Por favor intentá de nuevo.');
         }
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Error de conexión. Por favor verifica tu conexión a internet.');
+      await showAlert('Error de conexión', 'Por favor verificá tu conexión a internet.');
     } finally {
       setLoading(false);
     }
@@ -252,6 +257,13 @@ const RegisterForm = () => {
           </div>
         </div>
       </div>
+
+      <AlertModal
+        isOpen={alertModal.isOpen}
+        title={alertModal.title}
+        message={alertModal.message}
+        onClose={closeAlert}
+      />
     </div>
   );
 };
