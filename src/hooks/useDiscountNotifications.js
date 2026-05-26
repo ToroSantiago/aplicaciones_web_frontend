@@ -95,7 +95,8 @@ export const useDiscountNotifications = () => {
 
         if (permission === 'granted') {
           console.log('✓ Permisos de notificación concedidos');
-          startPolling();
+          window.location.reload();
+          return;
         }
       }
     };
