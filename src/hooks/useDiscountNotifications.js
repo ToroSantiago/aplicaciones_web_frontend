@@ -1,10 +1,8 @@
 import { useEffect, useRef } from 'react';
 
 /**
- * Hook que verifica cada 30 segundos si hay descuentos nuevos
- * Sin necesidad de endpoint dedicado en el backend.
- * 
- * Almacena en localStorage el timestamp del último descuento notificado.
+ * Hook que verifica cada 30 segundos si hay descuentos nuevos.
+ * Si el usuario aún no decidió, solicita permisos automáticamente.
  */
 export const useDiscountNotifications = () => {
   const notifiedTimestampRef = useRef(
@@ -12,22 +10,17 @@ export const useDiscountNotifications = () => {
   );
 
   useEffect(() => {
-    // Solo funciona si el navegador soporta Notifications
     if (!('Notification' in window)) {
       console.warn('Notificaciones no soportadas en este navegador');
       return;
     }
 
-    // Solo si el usuario ya otorgó permisos
-    if (Notification.permission !== 'granted') {
-      return;
-    }
+    let interval = null;
 
     const checkNewDiscounts = async () => {
       try {
-        // Traemos TODOS los descuentos
         const response = await fetch(
-          `${'https://essenzaroyalebackend.vercel.app/edp'}/descuentos`,
+          'https://essenzaroyalebackend.vercel.app/edp/descuentos',
           {
             method: 'GET',
             headers: {
@@ -43,22 +36,18 @@ export const useDiscountNotifications = () => {
 
         const data = await response.json();
 
-        if (data.success && data.data && Array.isArray(data.data)) {
-          // Recorrer descuentos y notificar los NUEVOS
+        if (data.success && Array.isArray(data.data)) {
           data.data.forEach((descuento) => {
-            // Convertir created_at a timestamp
             const descuentoTime = new Date(descuento.created_at).getTime();
 
-            // Si es más nuevo que el último que notificamos, notificar
             if (descuentoTime > notifiedTimestampRef.current) {
-              // Actualizar el timestamp
               notifiedTimestampRef.current = descuentoTime;
+
               localStorage.setItem(
                 'last_notified_discount_time',
                 descuentoTime.toString()
               );
 
-              // Construir el mensaje
               const variante = descuento.variantes?.[0];
               const perfume = variante?.perfume;
               const volumen = variante?.volumen;
@@ -69,17 +58,12 @@ export const useDiscountNotifications = () => {
                 ? `${perfume.nombre} - ${volumen}ml: ${porcentaje}% OFF`
                 : `Descuento del ${porcentaje}%`;
 
-              // Mostrar notificación
               new Notification(title, {
-                body: body,
+                body,
                 icon: '/icon-192.png',
                 badge: '/badge-72.png',
                 tag: `descuento-${descuento.id}`,
                 requireInteraction: false,
-                actions: [
-                  { action: 'open', title: 'Ver detalles' },
-                  { action: 'close', title: 'Descartar' }
-                ]
               });
 
               console.log(`✓ Notificación de descuento enviada: ${title}`);
@@ -91,13 +75,37 @@ export const useDiscountNotifications = () => {
       }
     };
 
-    // Verificar al cargar el componente
-    checkNewDiscounts();
+    const startPolling = () => {
+      if (interval) return;
 
-    // Verificar cada 30 segundos
-    const interval = setInterval(checkNewDiscounts, 30000);
+      console.log('✓ Iniciando monitoreo de descuentos');
 
-    // Limpiar interval al desmontar
-    return () => clearInterval(interval);
+      checkNewDiscounts();
+      interval = setInterval(checkNewDiscounts, 30000);
+    };
+
+    const init = async () => {
+      if (Notification.permission === 'granted') {
+        startPolling();
+        return;
+      }
+
+      if (Notification.permission === 'default') {
+        const permission = await Notification.requestPermission();
+
+        if (permission === 'granted') {
+          console.log('✓ Permisos de notificación concedidos');
+          startPolling();
+        }
+      }
+    };
+
+    init();
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
   }, []);
 };
