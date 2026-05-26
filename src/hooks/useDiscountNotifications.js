@@ -85,17 +85,26 @@ export const useDiscountNotifications = () => {
     };
 
     const init = async () => {
+      // ya autorizado → arrancar normal
       if (Notification.permission === 'granted') {
         startPolling();
         return;
       }
+
+      // evitar reload infinito
+      const alreadyReloaded = sessionStorage.getItem('notif_reload_done');
 
       if (Notification.permission === 'default') {
         const permission = await Notification.requestPermission();
 
         if (permission === 'granted') {
           console.log('✓ Permisos de notificación concedidos');
-          window.location.reload();
+
+          if (!alreadyReloaded) {
+            sessionStorage.setItem('notif_reload_done', 'true');
+            window.location.reload();
+          }
+
           return;
         }
       }
