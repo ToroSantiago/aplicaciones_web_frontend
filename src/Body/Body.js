@@ -65,7 +65,7 @@ const Body = () => {
   const fetchPerfumes = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`${API_URL}/paginated`)
+      const response = await fetch(`${API_URL}/paginated?per_page=20`)
 
       if (!response.ok) {
         throw new Error("Error al obtener los perfumes")
