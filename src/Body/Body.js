@@ -344,6 +344,10 @@ const Body = () => {
                           }
                           className="luxury-product-image"
                           alt={perfume.nombre}
+                          loading="lazy"
+                          decoding="async"
+                          width="400"
+                          height="400"
                         />
                         {discountInfo.algunoConDescuento && (
                           <span className="luxury-discount-badge">
