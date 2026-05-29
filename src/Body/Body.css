@@ -156,6 +156,11 @@
   cursor: pointer;
 }
 
+.luxury-filter-toggle-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .filter-count {
   background: rgba(0,0,0,.2);
   width: 22px;
@@ -581,7 +586,7 @@
 }
 
 /* =========================================
-   ALERTS / LOADING
+   ALERTS / LOADING & SKELETONS
 ========================================= */
 
 .luxury-alert {
@@ -617,6 +622,31 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+/* OPTIMIZACIÓN: Animación Shimmer de carga elegante para Skeletons */
+@keyframes luxurySkeletonShimmer {
+  0% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.45;
+  }
+}
+
+.skeleton-card-loading {
+  pointer-events: none;
+  border-color: #232323 !important;
+}
+
+.skeleton-box {
+  background-color: #222222;
+  border-radius: 8px;
+  animation: luxurySkeletonShimmer 1.5s infinite ease-in-out;
+  display: inline-block;
 }
 
 /* =========================================

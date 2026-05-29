@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import "./Body.css"
 import { addToCart } from "../Carrito/carrito"
 import { AlertModal, useCustomModal } from "../Modal/modal"
@@ -12,16 +12,12 @@ const Body = () => {
   const [error, setError] = useState(null)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
-  // Hook de modales propios (reemplaza alert() nativo y el modal hecho con
-  // document.createElement que tenía addToCart antes).
   const { alertModal, showAlert, closeAlert } = useCustomModal()
 
-  // Estados para el modal de detalles
   const [selectedPerfume, setSelectedPerfume] = useState(null)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [selectedVolume, setSelectedVolume] = useState("")
 
-  // Estados para los filtros
   const [filters, setFilters] = useState({
     genero: "",
     volumen: "",
@@ -29,16 +25,12 @@ const Body = () => {
     ordenPrecio: "",
   })
 
-  // Reemplaza esta URL con la URL de tu backend en Vercel
   const API_URL = "https://aplicacioneswebbackend-git-dev-torosantiagos-projects.vercel.app/edp"
 
   useEffect(() => {
     fetchPerfumes()
   }, [])
 
-  // Aplicar filtros cuando cambien los filtros o los perfumes.
-  // La lógica vive inline acá (en vez de en una función separada) para que
-  // eslint-plugin-react-hooks pueda chequear correctamente las dependencias.
   useEffect(() => {
     let filtered = [...perfumes]
 
@@ -106,10 +98,8 @@ const Body = () => {
     setIsFilterOpen(!isFilterOpen)
   }
 
-  // Funciones para el modal de detalles
   const openDetailModal = (perfume) => {
     setSelectedPerfume(perfume)
-    // Seleccionar el primer volumen disponible con stock
     const primeraVarianteConStock = perfume.variantes?.find((v) => v.stock > 0)
     setSelectedVolume(primeraVarianteConStock ? primeraVarianteConStock.volumen.toString() : "")
     setIsDetailModalOpen(true)
@@ -121,8 +111,8 @@ const Body = () => {
     setSelectedVolume("")
   }
 
-  // Obtener valores únicos para los filtros
-  const getUniqueVolumes = () => {
+  // OPTIMIZACIÓN 3: useMemo para evitar recalcular marcas y volúmenes en cada render
+  const uniqueVolumes = useMemo(() => {
     const volumes = new Set()
     perfumes.forEach((perfume) => {
       if (perfume.variantes) {
@@ -130,23 +120,19 @@ const Body = () => {
       }
     })
     return Array.from(volumes).sort((a, b) => a - b)
-  }
+  }, [perfumes])
 
-  const getUniqueBrands = () => {
+  const uniqueBrands = useMemo(() => {
     const brands = [...new Set(perfumes.map((p) => p.marca))]
     return brands.sort()
-  }
+  }, [perfumes])
 
   const getGenderLabel = (genero) => {
     switch (genero) {
-      case "M":
-        return "Masculino"
-      case "F":
-        return "Femenino"
-      case "U":
-        return "Unisex"
-      default:
-        return genero
+      case "M": return "Masculino"
+      case "F": return "Femenino"
+      case "U": return "Unisex"
+      default: return genero
     }
   }
 
@@ -155,23 +141,15 @@ const Body = () => {
     return selectedPerfume.variantes.find((v) => v.volumen.toString() === selectedVolume)
   }
 
-  // Helpers de precio con descuento.
-  // El backend devuelve por variante: precio (original), precio_final
-  // (con descuento aplicado), tiene_descuento (bool), descuento_porcentaje.
-  // Estos helpers normalizan el acceso y formatean para mostrar.
   const formatPrice = (n) =>
     Number.parseFloat(n).toLocaleString("es-AR", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })
 
-  // Precio "real" que se va a cobrar (precio_final si hay descuento, sino el normal)
   const getVariantPrice = (variant) =>
     Number.parseFloat(variant?.precio_final ?? variant?.precio ?? 0)
 
-  // Datos de descuento agregados a nivel perfume (para la card del catálogo).
-  // Calcula min/max sobre precio_final para reflejar el rango real que paga
-  // el cliente, no el rango original.
   const getPerfumeDiscountSummary = (perfume) => {
     const variantes = perfume?.variantes ?? []
     if (variantes.length === 0) {
@@ -198,7 +176,13 @@ const Body = () => {
     }
   }
 
-  // Componente de filtros reutilizable
+  // OPTIMIZACIÓN 2: Inyección de tamaño dinámico para URLs de Cloudinary
+  const getDynamicCloudinaryUrl = (url, width) => {
+    if (!url || !url.includes("cloudinary.com")) return url || "https://via.placeholder.com/400x400/1a1a1a/ffffff?text=Sin+Imagen"
+    // Inserta la transformación de ancho justo después de /upload/
+    return url.replace("/upload/", `/upload/c_scale,w_${width},f_auto,q_auto/`)
+  }
+
   const FilterContent = () => (
     <>
       <div className="luxury-filter-group">
@@ -223,7 +207,7 @@ const Body = () => {
           onChange={(e) => handleFilterChange("marca", e.target.value)}
         >
           <option value="">Todas las marcas</option>
-          {getUniqueBrands().map((marca) => (
+          {uniqueBrands.map((marca) => (
             <option key={marca} value={marca}>
               {marca}
             </option>
@@ -239,7 +223,7 @@ const Body = () => {
           onChange={(e) => handleFilterChange("volumen", e.target.value)}
         >
           <option value="">Todos los tamaños</option>
-          {getUniqueVolumes().map((volumen) => (
+          {uniqueVolumes.map((volumen) => (
             <option key={volumen} value={volumen}>
               {volumen}ml
             </option>
@@ -271,17 +255,19 @@ const Body = () => {
     </>
   )
 
-  if (loading) {
-    return (
-      <div className="luxury-body-container">
-        <div className="container">
-          <div className="luxury-loading">
-            <div className="luxury-spinner"></div>
-          </div>
+  // OPTIMIZACIÓN 1: Componente esqueleto interno para simular la estructura
+  const SkeletonCard = () => (
+    <div className="col-xl-4 col-lg-6 col-md-6 col-mobile-6">
+      <div className="luxury-product-card skeleton-card-loading">
+        <div className="luxury-product-image-container skeleton-box" style={{ height: "250px" }}></div>
+        <div className="luxury-product-body">
+          <div className="skeleton-box" style={{ width: "60%", height: "20px", marginBottom: "10px" }}></div>
+          <div className="skeleton-box" style={{ width: "40%", height: "15px", marginBottom: "15px" }}></div>
+          <div className="skeleton-box" style={{ width: "100%", height: "40px" }}></div>
         </div>
       </div>
-    )
-  }
+    </div>
+  )
 
   if (error) {
     return (
@@ -302,15 +288,18 @@ const Body = () => {
             <h3 className="luxury-sidebar-title">Filtros</h3>
           </div>
           <div className="luxury-sidebar-content">
-            <FilterContent />
+            {loading ? (
+              <div className="skeleton-box" style={{ width: "100%", height: "200px" }}></div>
+            ) : (
+              <FilterContent />
+            )}
           </div>
         </aside>
 
         {/* Contenido principal */}
         <main className="luxury-main-content">
-          {/* Botón de filtros para móvil */}
           <div className="luxury-mobile-filter-button">
-            <button className="luxury-filter-toggle-btn" onClick={toggleFilterModal}>
+            <button className="luxury-filter-toggle-btn" disabled={loading} onClick={toggleFilterModal}>
               <span className="filter-icon">🔍</span>
               Filtros
               <span className="filter-count">{Object.values(filters).filter((value) => value !== "").length}</span>
@@ -320,7 +309,10 @@ const Body = () => {
           {/* Resultados */}
           <div className="luxury-products-container">
             <div className="row g-3 g-md-4">
-              {filteredPerfumes.length === 0 ? (
+              {loading ? (
+                // Mostramos 6 skeletons fijos mientras la API de Vercel procesa
+                Array.from({ length: 6 }).map((_, idx) => <SkeletonCard key={idx} />)
+              ) : filteredPerfumes.length === 0 ? (
                 <div className="col-12">
                   <div className="luxury-alert">
                     {perfumes.length === 0
@@ -332,63 +324,63 @@ const Body = () => {
                 filteredPerfumes.map((perfume) => {
                   const discountInfo = getPerfumeDiscountSummary(perfume)
                   return (
-                  <div key={perfume.id} className="col-xl-4 col-lg-6 col-md-6 col-mobile-6">
-                    <div
-                      className={`luxury-product-card ${perfume.hay_stock ? "luxury-product-clickable" : "luxury-product-disabled"}`}
-                      onClick={perfume.hay_stock ? () => openDetailModal(perfume) : undefined}
-                    >
-                      <div className="luxury-product-image-container">
-                        <img
-                          src={
-                            perfume.imagen_url || "https://via.placeholder.com/400x400/1a1a1a/ffffff?text=Sin+Imagen"
-                          }
-                          className="luxury-product-image"
-                          alt={perfume.nombre}
-                          loading="lazy"
-                          decoding="async"
-                          width="400"
-                          height="400"
-                        />
-                        {discountInfo.algunoConDescuento && (
-                          <span className="luxury-discount-badge">
-                            -{Math.round(discountInfo.maxPorcentaje)}%
-                          </span>
-                        )}
-                      </div>
-                      <div className="luxury-product-body">
-                        <div className="luxury-product-header">
-                          <h5 className="luxury-product-title">{perfume.nombre}</h5>
-                          <h6 className="luxury-product-brand">{perfume.marca}</h6>
-                        </div>
-
-                        <p className="luxury-product-description">{perfume.descripcion}</p>
-
-                        <div className="luxury-product-badges">
-                          <div className="luxury-product-gender">
-                            <span className="luxury-product-value">{getGenderLabel(perfume.genero)}</span>
-                          </div>
-
-                          <div className="luxury-product-price">
-                            {discountInfo.algunoConDescuento && discountInfo.minOriginal !== discountInfo.minFinal && (
-                              <span className="luxury-price-original">
-                                ${formatPrice(discountInfo.minOriginal)}
-                              </span>
-                            )}
-                            <span className="luxury-price-value">
-                              ${formatPrice(discountInfo.minFinal)}
+                    <div key={perfume.id} className="col-xl-4 col-lg-6 col-md-6 col-mobile-6">
+                      <div
+                        className={`luxury-product-card ${perfume.hay_stock ? "luxury-product-clickable" : "luxury-product-disabled"}`}
+                        onClick={perfume.hay_stock ? () => openDetailModal(perfume) : undefined}
+                      >
+                        <div className="luxury-product-image-container">
+                          <img
+                            // Pasamos un w_350 nativo para las tarjetas miniatura.
+                            // Cloudinary reduce drásticamente los KB de transferencia aquí.
+                            src={getDynamicCloudinaryUrl(perfume.imagen_url, 350)}
+                            className="luxury-product-image"
+                            alt={perfume.nombre}
+                            loading="lazy"
+                            decoding="async"
+                            width="400"
+                            height="400"
+                          />
+                          {discountInfo.algunoConDescuento && (
+                            <span className="luxury-discount-badge">
+                              -{Math.round(discountInfo.maxPorcentaje)}%
                             </span>
+                          )}
+                        </div>
+                        <div className="luxury-product-body">
+                          <div className="luxury-product-header">
+                            <h5 className="luxury-product-title">{perfume.nombre}</h5>
+                            <h6 className="luxury-product-brand">{perfume.marca}</h6>
                           </div>
 
-                          <div
-                            className={`luxury-stock-info ${perfume.hay_stock ? "luxury-stock-available" : "luxury-stock-unavailable"}`}
-                          >
-                            <span className="luxury-stock-icon">{perfume.hay_stock ? "✅" : "❌"}</span>
-                            <span className="luxury-stock-text">{perfume.hay_stock ? "Disponible" : "Agotado"}</span>
+                          <p className="luxury-product-description">{perfume.descripcion}</p>
+
+                          <div className="luxury-product-badges">
+                            <div className="luxury-product-gender">
+                              <span className="luxury-product-value">{getGenderLabel(perfume.genero)}</span>
+                            </div>
+
+                            <div className="luxury-product-price">
+                              {discountInfo.algunoConDescuento && discountInfo.minOriginal !== discountInfo.minFinal && (
+                                <span className="luxury-price-original">
+                                  ${formatPrice(discountInfo.minOriginal)}
+                                </span>
+                              )}
+                              <span className="luxury-price-value">
+                                ${formatPrice(discountInfo.minFinal)}
+                              </span>
+                            </div>
+
+                            <div
+                              className={`luxury-stock-info ${perfume.hay_stock ? "luxury-stock-available" : "luxury-stock-unavailable"}`}
+                            >
+                              <span className="luxury-stock-icon">{perfume.hay_stock ? "✅" : "❌"}</span>
+                              <span className="luxury-stock-text">{perfume.hay_stock ? "Disponible" : "Agotado"}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
                   )
                 })
               )}
@@ -427,20 +419,16 @@ const Body = () => {
               </button>
             </div>
             <div className="luxury-detail-modal-content">
-              {/* Imagen centrada arriba */}
               <div className="luxury-detail-modal-image-top">
                 <img
-                  src={
-                    selectedPerfume.imagen_url || "https://via.placeholder.com/400x400/1a1a1a/ffffff?text=Sin+Imagen"
-                  }
+                  // Para el modal extendido pedimos una resolución un poco mayor (600px)
+                  src={getDynamicCloudinaryUrl(selectedPerfume.imagen_url, 600)}
                   alt={selectedPerfume.nombre}
                   className="luxury-detail-image"
                 />
               </div>
 
-              {/* Contenido principal: descripción a la izquierda, opciones a la derecha */}
               <div className="luxury-detail-main-content">
-                {/* Descripción a la izquierda */}
                 <div className="luxury-detail-description-section">
                   <div className="luxury-detail-product-info">
                     <h3 className="luxury-detail-title">{selectedPerfume.nombre}</h3>
@@ -458,7 +446,6 @@ const Body = () => {
                   </div>
                 </div>
 
-                {/* Opciones del carrito a la derecha */}
                 <div className="luxury-detail-cart-section">
                   <div className="luxury-detail-volume-section">
                     <label className="luxury-detail-label">Seleccionar Tamaño</label>
@@ -513,11 +500,6 @@ const Body = () => {
                         onClick={async () => {
                           if (getSelectedVariant().stock <= 0) return
 
-                          // Crear un producto con el precio correcto según el volumen seleccionado.
-                          // `precio` guarda el precio_final (con descuento si aplica) — es el
-                          // que se usa para totales y para mandar al checkout.
-                          // `precio_original` y los campos de descuento se guardan para mostrar
-                          // el tachado en el carrito.
                           const variantSel = getSelectedVariant()
                           const productToAdd = {
                             ...selectedPerfume,
@@ -529,8 +511,6 @@ const Body = () => {
                             stock: variantSel.stock,
                           }
 
-                          // addToCart ahora devuelve { ok, error?, message? }. El UI
-                          // decide si abrir un modal de éxito o uno de error.
                           const result = await addToCart(productToAdd, 1, Number.parseInt(selectedVolume))
 
                           if (!result.ok) {
@@ -559,7 +539,6 @@ const Body = () => {
         </div>
       )}
 
-      {/* Alert modal compartido para avisos (agregado al carrito, errores, etc.) */}
       <AlertModal
         isOpen={alertModal.isOpen}
         title={alertModal.title}
