@@ -1,4 +1,4 @@
-const CACHE_NAME = 'essenza-v1';
+const CACHE_NAME = 'essenza-v2';
 const OFFLINE_PAGE = '/offline.html';
 const URLS_TO_CACHE = [
   '/',
@@ -34,7 +34,7 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Estrategia: Network First para API, Cache First para assets
+// Estrategia: Network First para index.html y bundles, Cache First para otros assets
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
@@ -63,7 +63,27 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Assets estáticos: Cache First
+  // HTML (index.html): Network First para siempre tener versión actualizada
+  if (url.pathname.endsWith('/') || url.pathname.endsWith('.html')) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(request, clone);
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          return caches.match(request);
+        })
+    );
+    return;
+  }
+
+  // Assets estáticos (JS, CSS, imágenes): Cache First
   event.respondWith(
     caches.match(request).then((cached) => {
       if (cached) return cached;
