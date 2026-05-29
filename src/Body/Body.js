@@ -461,7 +461,7 @@ const Body = () => {
                 {/* Opciones del carrito a la derecha */}
                 <div className="luxury-detail-cart-section">
                   <div className="luxury-detail-volume-section">
-                    <label className="luxury-detail-label">🧴 Seleccionar Tamaño</label>
+                    <label className="luxury-detail-label">Seleccionar Tamaño</label>
                     <select
                       className="luxury-detail-volume-select"
                       value={selectedVolume}
@@ -501,7 +501,7 @@ const Body = () => {
                       <div
                         className={`luxury-detail-stock ${getSelectedVariant().stock > 0 ? "luxury-detail-stock-available" : "luxury-detail-stock-unavailable"}`}
                       >
-                        <span className="luxury-detail-label">📦 Disponibilidad</span>
+                        <span className="luxury-detail-label">Disponibilidad</span>
                         <span className="luxury-detail-value">
                           {getSelectedVariant().stock > 0 ? `${getSelectedVariant().stock} unidades` : "Sin stock"}
                         </span>

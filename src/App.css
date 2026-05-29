@@ -1,5 +1,6 @@
 body, #root {
   background-color: #0a0a0a;
+  margin: 0;
 }
 
 .App {

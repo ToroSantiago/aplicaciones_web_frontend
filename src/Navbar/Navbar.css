@@ -1,254 +1,252 @@
-/* Navbar.css - Estilos para Essenza Royale */
+/* =========================================
+   NAVBAR - ESSENZA ROYALE
+========================================= */
 
-/* Navbar principal */
 .custom-navbar {
-  background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-  border-bottom: 1px solid #374151;
   position: sticky;
   top: 0;
   z-index: 1000;
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  background: rgba(10, 10, 10, 0.88);
+
+  border-bottom: 1px solid rgba(184, 134, 11, 0.15);
+
+  box-shadow:
+    0 6px 24px rgba(0, 0, 0, 0.35),
+    0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Container principal */
-.navbar-container {
-  max-width: 1200px;
-  min-width: 300px;
-  margin: 0 auto;
-  padding: 0 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 4rem;
+/* Glow line */
+.custom-navbar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 1px;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(184, 134, 11, 0.45),
+    transparent
+  );
 }
+
+/* =========================================
+   CONTAINER
+========================================= */
+
+.navbar-container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+
+  padding: 0 2rem;
+
+  height: 78px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* =========================================
+   LEFT SIDE
+========================================= */
 
 .navbar-brand-container {
-  flex: 1;
-}
-
-.desktop-menu {
-  flex: 1;
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-}
-
-.navbar-brand-btn {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #ffffff;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: color 0.2s ease;
-  padding: 0;
   display: flex;
   align-items: center;
+  justify-content: flex-start;
+
+  flex: 1;
 }
 
-.navbar-brand-btn:hover .navbar-logo {
-  transform: scale(1.75);
+/* =========================================
+   RIGHT SIDE
+========================================= */
+
+.desktop-menu {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  flex: 1;
+
+  gap: 0.85rem;
+}
+
+/* =========================================
+   LOGO
+========================================= */
+
+.navbar-brand-btn {
+  border: none;
+  background: transparent;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0;
+
+  transition: all 0.3s ease;
 }
 
 .navbar-logo {
-  height: 42px;
+  height: 65px;
   width: auto;
-  max-width: 180px;
+  margin-top: 5px;
   object-fit: contain;
-  display: block;
-  transform: scale(1.5);
-  transition: transform 0.2s ease;
+  transition:
+    transform 0.35s ease,
+    filter 0.35s ease;
+  filter:
+    drop-shadow(0 0 10px rgba(184, 134, 11, 0.15));
 }
 
-/* Botones de navegación */
-.nav-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  border: none;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  font-size: 0.875rem;
+.navbar-brand-btn:hover .navbar-logo {
+  transform: scale(1.06);
+
+  filter:
+    drop-shadow(0 0 18px rgba(212, 175, 55, 0.35));
 }
 
-.nav-btn-secondary {
-  color: #9ca3af;
-  background: transparent;
-}
+/* =========================================
+   BUTTONS
+========================================= */
 
-.nav-btn-secondary:hover {
-  background-color: #1f2937;
-  color: #ffffff;
-}
+.nav-btn,
+.mobile-nav-btn {
+  position: relative;
 
-/* Mobile logo */
-@media (max-width: 768px) {
-  .navbar-logo {
-    height: 34px;
-    max-width: 150px;
-  }
-}
-
-@media (max-width: 480px) {
-  .navbar-logo {
-    height: 30px;
-    max-width: 130px;
-  }
-}
-
-/* Mobile menu button container */
-.mobile-menu-btn-container {
-  display: none;
-}
-
-.mobile-toggle-btn {
-  background-color: #3a3c3f;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  color: #9ca3af;
-  border: none;
+  gap: 0.55rem;
+
+  border: 1px solid transparent;
+
+  background: rgba(255, 255, 255, 0.03);
+
+  color: #d1d5db;
+
   cursor: pointer;
-  transition: all 0.2s ease;
-}
 
-.mobile-toggle-btn:hover {
-  background-color: #374151;
-  color: #ffffff;
-}
-
-/* Mobile menu */
-.mobile-menu {
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition: all 0.3s ease-in-out;
-}
-
-.mobile-menu-open {
-  max-height: 8rem;
-  opacity: 1;
-}
-
-.mobile-menu-content {
-  padding: 0.5rem 1rem 1rem 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  background-color: #3a3c3f;
-  margin: 0 1rem;
-  border-radius: 0 0 0.5rem 0.5rem;
-  border: 1px solid #3a3c3f;
-  border-top: none;
-}
-
-/* Botones del menú móvil */
-.mobile-nav-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem;
-  border: none;
-  border-radius: 0.5rem;
+  font-size: 0.92rem;
   font-weight: 500;
-  cursor: pointer;
+  letter-spacing: 0.2px;
+
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.2s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease;
+
+  user-select: none;
+}
+
+.nav-btn {
+  height: 44px;
+  padding: 0 1.1rem;
+  border-radius: 14px;
+}
+
+.mobile-nav-btn {
   width: 100%;
-  text-align: left;
-  transition: all 0.2s ease;
-  font-size: 1rem;
+  min-height: 52px;
+
+  padding: 0.9rem 1rem;
+
+  border-radius: 14px;
+
+  justify-content: flex-start;
 }
 
-.mobile-nav-btn-secondary {
-  color: #9ca3af;
-  background: transparent;
-}
+/* =========================================
+   HOVER
+========================================= */
 
-.mobile-nav-btn-secondary:hover {
-  background-color: #374151;
+.nav-btn:hover,
+.mobile-nav-btn:hover {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(184, 134, 11, 0.14),
+      rgba(212, 175, 55, 0.08)
+    );
+
+  border-color: rgba(184, 134, 11, 0.25);
+
   color: #ffffff;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 6px 18px rgba(184, 134, 11, 0.12);
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .desktop-menu {
-    display: none;
-  }
+/* =========================================
+   ACTIVE
+========================================= */
 
-  .mobile-menu-btn-container {
-    display: block;
-  }
+.nav-btn:active,
+.mobile-nav-btn:active {
+  transform: scale(0.98);
 }
 
-@media (min-width: 769px) {
-  .mobile-menu {
-    display: none !important;
-  }
+/* =========================================
+   USER GREETING
+========================================= */
+
+.user-greet {
+  cursor: default !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(184, 134, 11, 0.16),
+      rgba(255, 255, 255, 0.03)
+    );
+
+  border-color: rgba(184, 134, 11, 0.2);
+
+  color: #f3f4f6;
 }
 
-/* Focus states para accesibilidad */
-.navbar-brand-btn:focus,
-.nav-btn:focus,
-.mobile-nav-btn:focus,
-.mobile-toggle-btn:focus {
-  outline: 2px solid #6b7280;
-  outline-offset: 2px;
-}
+/* =========================================
+   ICONS
+========================================= */
 
-/* Animaciones adicionales */
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.mobile-menu-open .mobile-menu-content {
-  animation: slideDown 0.3s ease;
-}
-
-/* Asegurar que los estilos no sean sobrescritos */
-.custom-navbar * {
-  box-sizing: border-box;
-}
-
-/* Eliminar estilos por defecto de botones */
-.custom-navbar button {
-  font-family: inherit;
-  line-height: inherit;
-}
-
-.custom-navbar button:focus {
-  outline-offset: 2px;
-}
-
-/* Hover effects adicionales */
 .nav-btn svg,
 .mobile-nav-btn svg {
-  transition: transform 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease;
 }
 
 .nav-btn:hover svg,
 .mobile-nav-btn:hover svg {
-  transform: scale(1.1);
+  transform: scale(1.08);
 }
 
-/* Estilos para el icono del carrito y contador */
+/* =========================================
+   CART
+========================================= */
+
 .cart-btn {
-  position: relative;
+  overflow: visible;
 }
 
 .cart-icon-container {
   position: relative;
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -256,64 +254,213 @@
 
 .cart-count {
   position: absolute;
-  top: -8px;
-  right: -8px;
-  background: #b8860b;
-  color: #1a1a1a;
+
+  top: -9px;
+  right: -10px;
+
+  width: 19px;
+  height: 19px;
+
+  border-radius: 999px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #d4af37,
+      #b8860b
+    );
+
+  color: #111;
+
   font-size: 0.7rem;
-  font-weight: bold;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
+  font-weight: 700;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  z-index: 10;
+
+  box-shadow:
+    0 4px 10px rgba(184, 134, 11, 0.4);
+
+  border: 1px solid rgba(255,255,255,0.15);
 }
 
-/* Ajustes específicos para desktop */
-@media (min-width: 769px) {
-  .desktop-menu .cart-btn .cart-count {
-    top: -6px;
-    right: -6px;
-  }
+/* =========================================
+   MOBILE BUTTON
+========================================= */
+
+.mobile-menu-btn-container {
+  display: none;
 }
 
-/* Ajustes específicos para móvil - contador en el menú hamburguesa */
-@media (max-width: 768px) {
-  .mobile-menu-content .cart-btn .cart-count {
-    top: -6px;
-    right: -6px;
-  }
+.mobile-toggle-btn {
+  width: 46px;
+  height: 46px;
 
-  /* Reducir altura del menú móvil ya que solo tiene el carrito */
-  .mobile-menu-open {
-    max-height: 8rem;
-  }
-}
+  border-radius: 14px;
 
-/* Estilo especial para el botón del carrito en móvil */
-@media (max-width: 768px) {
-  .mobile-nav-btn.cart-btn {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0.75rem;
-  }
-}
+  border: 1px solid rgba(255,255,255,0.06);
 
-/* ============================================
-   Auth-aware navbar: saludo + botones login/logout
-   ============================================ */
-.nav-btn .user-greet,
-.user-greet {
-  cursor: default;
-  opacity: 0.85;
-}
+  background:
+    rgba(255,255,255,0.04);
 
-.nav-btn,
-.mobile-nav-btn {
-  display: inline-flex;
+  color: #d1d5db;
+
+  cursor: pointer;
+
+  display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+
+  transition:
+    all 0.25s ease;
+}
+
+.mobile-toggle-btn:hover {
+  background:
+    rgba(184, 134, 11, 0.12);
+
+  border-color:
+    rgba(184, 134, 11, 0.2);
+
+  color: #fff;
+
+  transform: translateY(-1px);
+}
+
+/* =========================================
+   MOBILE MENU
+========================================= */
+
+.mobile-menu {
+  overflow: hidden;
+
+  max-height: 0;
+
+  opacity: 0;
+
+  transition:
+    max-height 0.35s ease,
+    opacity 0.3s ease;
+}
+
+.mobile-menu-open {
+  max-height: 500px;
+  opacity: 1;
+}
+
+.mobile-menu-content {
+  margin:
+    0 1rem 1rem;
+
+  padding: 1rem;
+
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(22,22,22,0.98),
+      rgba(14,14,14,0.98)
+    );
+
+  border:
+    1px solid rgba(184, 134, 11, 0.12);
+
+  box-shadow:
+    0 12px 30px rgba(0,0,0,0.35);
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.75rem;
+
+  animation: mobileMenuFade 0.25s ease;
+}
+
+/* =========================================
+   ANIMATIONS
+========================================= */
+
+@keyframes mobileMenuFade {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================
+   FOCUS
+========================================= */
+
+.nav-btn:focus,
+.mobile-nav-btn:focus,
+.mobile-toggle-btn:focus,
+.navbar-brand-btn:focus {
+  outline: 2px solid rgba(184, 134, 11, 0.45);
+  outline-offset: 2px;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+
+  .desktop-menu {
+    display: none;
+  }
+
+  .mobile-menu-btn-container {
+    display: block;
+  }
+
+  .navbar-container {
+    height: 74px;
+    padding: 0 1rem;
+  }
+
+  .navbar-logo {
+    height: 42px;
+  }
+}
+
+@media (min-width: 769px) {
+
+  .mobile-menu {
+    display: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .navbar-container {
+    padding: 0 0.8rem;
+  }
+
+  .navbar-logo {
+    height: 38px;
+  }
+
+  .mobile-menu-content {
+    margin:
+      0 0.75rem 0.75rem;
+  }
+}
+
+/* =========================================
+   RESET
+========================================= */
+
+.custom-navbar * {
+  box-sizing: border-box;
+}
+
+.custom-navbar button {
+  font-family: inherit;
 }

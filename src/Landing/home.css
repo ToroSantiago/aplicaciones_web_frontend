@@ -1,0 +1,201 @@
+/* =========================================
+   PAGE
+========================================= */
+
+.about-page {
+  background: #0a0a0a;
+  min-height: 100vh;
+}
+
+/* =========================================
+   HERO SECTION
+========================================= */
+
+.about-hero {
+  position: relative;
+
+  min-height: calc(100vh - 78px);
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 6rem;
+
+  background-image:
+    url('https://res.cloudinary.com/drnzeqcpu/image/upload/v1780061850/unnamed_2.jpg_oehaoi.jpg');
+
+  background-size: cover;
+  background-position: center;
+
+  overflow: hidden;
+}
+
+/* =========================================
+   OVERLAY
+========================================= */
+
+.about-overlay {
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0,0,0,0.88) 0%,
+      rgba(0,0,0,0.70) 35%,
+      rgba(0,0,0,0.35) 65%,
+      rgba(0,0,0,0.15) 100%
+    );
+}
+
+/* =========================================
+   CONTENT
+========================================= */
+
+.about-content {
+  position: relative;
+  z-index: 2;
+
+  max-width: 650px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.about-subtitle {
+  color: #d4af37;
+
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.35rem;
+
+  margin-bottom: 1.2rem;
+}
+
+.about-title {
+  color: #ffffff;
+
+  font-size: 5rem;
+  font-weight: 700;
+  line-height: 1.05;
+
+  margin: 0 0 1.5rem 0;
+
+  text-shadow:
+    0 6px 20px rgba(0,0,0,0.45);
+}
+
+.about-description {
+  color: #d1d5db;
+
+  font-size: 1.1rem;
+  line-height: 1.9;
+
+  margin-bottom: 2rem;
+
+  max-width: 560px;
+}
+
+/* =========================================
+   BUTTON
+========================================= */
+
+.about-button {
+  height: 54px;
+
+  padding: 0 2rem;
+
+  border: none;
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #d4af37,
+      #b8860b
+    );
+
+  color: #111;
+
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    opacity 0.25s ease;
+
+  box-shadow:
+    0 10px 24px rgba(184, 134, 11, 0.25);
+}
+
+.about-button:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 14px 28px rgba(184, 134, 11, 0.35);
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 992px) {
+
+  .about-hero {
+    padding: 0 3rem;
+  }
+
+  .about-title {
+    font-size: 4rem;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .about-hero {
+    min-height: calc(100vh - 74px);
+
+    padding: 4rem 1.5rem;
+
+    align-items: center;
+  }
+
+  .about-overlay {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(0,0,0,0.88),
+        rgba(0,0,0,0.65)
+      );
+  }
+
+  .about-title {
+    font-size: 3rem;
+  }
+
+  .about-description {
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .about-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .about-title {
+    font-size: 2.4rem;
+  }
+
+  .about-subtitle {
+    font-size: 0.75rem;
+    letter-spacing: 0.25rem;
+  }
+}

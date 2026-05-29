@@ -8,6 +8,7 @@ import Success from '../pages/Success';
 import Failed from '../pages/Failed';
 import MisCompras from '../MisCompras/MisCompras';
 import Footer from '../Footer/Footer';
+import Home from '../Landing/home';
 
 const Layout = () => {
   const location = useLocation();
@@ -17,6 +18,8 @@ const Layout = () => {
       case '/':
       case '/home':
         return <Body />;
+      case '/inicio':
+        return <Home />;
       case '/authForm':
         return <AuthForm />;
       case '/register':
