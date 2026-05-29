@@ -111,7 +111,11 @@ const Navbar = () => {
         <div className="navbar-container">
           <div className="navbar-brand-container">
             <button onClick={() => goTo("/")} className="navbar-brand-btn">
-              Essenza Royale
+              <img
+                src="https://res.cloudinary.com/drnzeqcpu/image/upload/v1779636864/logo_t96wg3.svg"
+                alt="Essenza Royale"
+                className="navbar-logo"
+              />
             </button>
           </div>
 
