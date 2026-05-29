@@ -37,15 +37,27 @@
   font-size: 1.5rem;
   font-weight: 700;
   color: #ffffff;
-  background: none;
+  background: transparent;
   border: none;
   cursor: pointer;
   transition: color 0.2s ease;
   padding: 0;
+  display: flex;
+  align-items: center;
 }
 
-.navbar-brand-btn:hover {
-  color: #9ca3af;
+.navbar-brand-btn:hover .navbar-logo {
+  transform: scale(1.75);
+}
+
+.navbar-logo {
+  height: 42px;
+  width: auto;
+  max-width: 180px;
+  object-fit: contain;
+  display: block;
+  transform: scale(1.5);
+  transition: transform 0.2s ease;
 }
 
 /* Botones de navegación */
@@ -71,6 +83,21 @@
 .nav-btn-secondary:hover {
   background-color: #1f2937;
   color: #ffffff;
+}
+
+/* Mobile logo */
+@media (max-width: 768px) {
+  .navbar-logo {
+    height: 34px;
+    max-width: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-logo {
+    height: 30px;
+    max-width: 130px;
+  }
 }
 
 /* Mobile menu button container */
